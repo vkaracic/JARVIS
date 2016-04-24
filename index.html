@@ -23,18 +23,18 @@
         <h3>Perceptron structure:</h3>
         <div class="form-group">
           <label>Input layers number: </label>
-          <input type="number" class="form-control" name="input-nodes">
+          <input type="number" class="form-control" name="input-nodes" min="1" value="2">
         </div>
         <div class="hidden-layer form-group">
           <label>Hidden layers number: </label>
-          <input type="number" class="form-control" name="hidden-nodes">
+          <input type="number" class="form-control" name="hidden-nodes" min="1" value="3">
           <div class="append-layer" type="hidden"></div>
           <button class="add-hidden-layer btn btn-primary">Add hidden layer</button>
         </div>
 
         <div class="form-group">
           <label>Output layers number: </label>
-          <input type="number" class="form-control" name="output-nodes">
+          <input type="number" class="form-control" name="output-nodes" min="1" value="1">
         </div>
       </div>
 
@@ -79,9 +79,29 @@
       </div>
     </div>
     <div class="row">
-      <button class="train-network col-md-12 btn btn-default">TRAIN</button>
+    <button class="train-network col-md-12 btn-lg btn-success">TRAIN</button>
+    </div>
+
+    <div class="row network-testing">
+      <form class="form-inline">
+        <div class="form-group">
+          <label>Input: </label><input type="text" class="form-control" name="test-input">
+          <label>Output: </label><span class="test-output"></span>
+        </div>
+      </form>
+      <button class="btn btn-success test-network">Test</button>
+    </div>
+
+
+    <div class="row visualization">
+    <div class="col-md-8 network-display">
+    <svg width="600" height="400">
+      
+    </svg>
+    </div>
     </div>
   </div>
+
 
   <script src="lib/imports/jquery-1.12.3.min.js"></script>
   <script src="lib/imports/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
@@ -89,6 +109,7 @@
   <script src="lib/imports/d3.js"></script>
   <script src="lib/imports/synaptic.js"></script>
   <script src="static/js/ui.js"></script>
-  <script src="script.js"></script>
+  <script src="static/js/initd3.js"></script>
+  <script src="static/js/perceptron.js"></script>
 </body>
 </html>

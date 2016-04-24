@@ -1,5 +1,6 @@
+// Append new hidden-layer input fields.
 $('button.add-hidden-layer').click(function() {
-  var inputElement = '<input type="number" class="form-control" name="hidden-nodes">';
+  var inputElement = '<input type="number" class="form-control" name="hidden-nodes" min="1">';
   $('.append-layer').append(inputElement);
 });
 

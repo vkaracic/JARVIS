@@ -2,6 +2,23 @@ header {
     min-height: 100px;
 }
 
-.network-structure .hidden-nodes {
+.network-structure input[name=hidden-nodes] {
     margin-bottom: 10px;
+}
+
+.network-testing {
+    margin-top: 50px;
+}
+
+.network-testing form {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.network-testing label {
+    margin-right: 10px;
+}
+
+.network-testing input {
+    margin-right: 20px;
 }

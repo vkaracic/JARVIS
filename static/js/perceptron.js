@@ -5,8 +5,8 @@ function Perceptron(input, hidden, output)
 
     // a perceptron can have more hidden layers
     var hiddenLayers = [];
-    _.each(hidden, function (hiddenLayer) {
-      var hiddenLayer = new Layer(hidden);
+    _.each(hidden, function (neuronNum) {
+      var hiddenLayer = new Layer(neuronNum);
       hiddenLayers.push(hiddenLayer);
     });
     var outputLayer = new Layer(output);
@@ -27,23 +27,25 @@ function Perceptron(input, hidden, output)
 
 // CREATE THE NETWORK
 function networkStructure() {
-  var input = $('input[name=input-nodes]').val();
+  var input = parseInt($('input[name=input-nodes]').val());
 
   var hidden = [];
   $('input[name=hidden-nodes]').each(function(el) {
-    hidden.push(parseInt($(this).val()));
+    if ($(this).val())
+      hidden.push(parseInt($(this).val()));
   });
-
-  var output = $('input[name=output-nodes]').val();
+  var output = parseInt($('input[name=output-nodes]').val());
 
   Perceptron.prototype = new Network();
   Perceptron.prototype.constructor = Perceptron;
-
-  var myPerceptron = new Perceptron(input,hidden,output);
+  var myPerceptron = new Perceptron(input, hidden, output);
   return myPerceptron;
 }
 
 // RETRIEVE AND PREPARE TRAINING DATA
+// The format of the train set has to be a list of objects, each with
+// 'input' property that is a list of input values, and 'output' that is
+// also a list of output values.
 function trainingSet() {
   var inputNum = parseInt($('input[name=input-nodes]').val());
   var outputNum = parseInt($('input[name=output-nodes]').val());
@@ -90,14 +92,23 @@ function trainNetwork() {
   return myPerceptron;
 }
 
+function testNetwork(network, input) {
+  // Input list should contain as many elements
+  // as there are input nodes on the network.
+  if (network.layers.input.size != input.length)
+    throw new Error('Inconsistent data size!');
+
+  var output = network.activate(input);
+  $('span.test-output').text(output);
+}
+
 // TEST / RUN THE NETWORK
+var nn;
 $('button.train-network').click(function() {
   nn = trainNetwork();
+  initNetworkSvg();
+});
 
-  console.log(nn.activate([1,20]));
-  console.log(nn.activate([1,15]));
-  console.log(nn.activate([1,10]));
-  console.log(nn.activate([1,30]));
-  console.log(nn.activate([1,35]));
-  console.log(nn.activate([1,40]));
+$('button.test-network').click(function() {
+  testNetwork(nn, $('input[name=test-input]').val().split(','));
 });
