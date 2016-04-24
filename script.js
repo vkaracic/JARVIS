@@ -25,17 +25,16 @@ function Perceptron(input, hidden, output)
     });
 }
 
-// Retrieve the values in the input fields and upon those
-// create a new Perceptron network.
+// CREATE THE NETWORK
 function networkStructure() {
-  var input = $('.input-nodes').val();
+  var input = $('input[name=input-nodes]').val();
 
   var hidden = [];
-  $('.hidden-nodes').each(function(el) {
+  $('input[name=hidden-nodes]').each(function(el) {
     hidden.push(parseInt($(this).val()));
   });
 
-  var output = $('.output-nodes').val();
+  var output = $('input[name=output-nodes]').val();
 
   Perceptron.prototype = new Network();
   Perceptron.prototype.constructor = Perceptron;
@@ -45,19 +44,60 @@ function networkStructure() {
 }
 
 // RETRIEVE AND PREPARE TRAINING DATA
+function trainingSet() {
+  var inputNum = parseInt($('input[name=input-nodes]').val());
+  var outputNum = parseInt($('input[name=output-nodes]').val());
+  var dataRowLen = inputNum + outputNum;
+  var trainingData = $("textarea[name=training-data]").val().split('\n');
+  var trainSet = [];
 
+  _.forEach(trainingData, function(train_row) {
+    var values = train_row.split(',');
 
-// TRAIN
+    // training data items count has to be same
+    // as input_nodes+output_nodes count.
+    if (values.length > dataRowLen)
+      throw 'Inconsistent training data';
 
+    trainSet.push({
+      'input': _.first(values, inputNum),
+      'output': _.last(values, outputNum)
+    })
+  });
 
-// TEST / RUN THE NETWORK
-$('button.create-network').click(function() {
+  return trainSet;
+}
+
+function trainNetwork() {
   var myPerceptron = networkStructure();
   var myTrainer = new Trainer(myPerceptron);
-  myTrainer.XOR();
+  var trainingData = trainingSet();
 
-  console.log(myPerceptron.activate([0,0]));
-  console.log(myPerceptron.activate([1,0]));
-  console.log(myPerceptron.activate([0,1]));
-  console.log(myPerceptron.activate([1,1]));
+  var rate = parseFloat($('input[name=learning-rate]').val());
+  var iterations = parseInt($('input[name=iterations]').val());
+  var error = parseFloat($('input[name=error-rate]').val());
+  var shuffle = $('input[name="shuffle"]').is(':checked');
+  var log = parseInt($('input[name=log-rate]').val());
+
+  myTrainer.train(trainingData, {
+    rate: rate,
+    iterations: iterations,
+    error: error,
+    shuffle: shuffle,
+    log: log,
+  });
+  
+  return myPerceptron;
+}
+
+// TEST / RUN THE NETWORK
+$('button.train-network').click(function() {
+  nn = trainNetwork();
+
+  console.log(nn.activate([1,20]));
+  console.log(nn.activate([1,15]));
+  console.log(nn.activate([1,10]));
+  console.log(nn.activate([1,30]));
+  console.log(nn.activate([1,35]));
+  console.log(nn.activate([1,40]));
 });

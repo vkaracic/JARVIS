@@ -1,75 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>JARVIS</title>
-    <link rel="stylesheet" href="lib/imports/bootstrap-3.3.6-dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/style.css">
+  <meta charset="utf-8">
+  <title>JARVIS</title>
+  <link rel="stylesheet" href="lib/imports/bootstrap-3.3.6-dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="static/css/style.css">
 </head>
 
 <body>
-    <header>
-    </header>
-    <div class="container">
-        <ul class="nav nav-pills nav-justified">
-            <li role="presentation" class="active"><a href="#">Perceptron</a></li>
-            <li role="presentation"><a href="#">LSTM</a></li>
-            <li role="presentation"><a href="#">Liquid</a></li>
-            <li role="presentation"><a href="#">Hopfield</a></li>
-        </ul>
+  <header>
+  </header>
+  <div class="container">
+    <ul class="nav nav-pills nav-justified">
+      <li role="presentation" class="active"><a href="#">Perceptron</a></li>
+      <li role="presentation"><a href="#">LSTM</a></li>
+      <li role="presentation"><a href="#">Liquid</a></li>
+      <li role="presentation"><a href="#">Hopfield</a></li>
+    </ul>
 
-        <div class="row">
-            <div class="col-md-4 network-structure">
-                <h3>Perceptron structure:</h3>
-                <div class="form-group">
-                    <label>Input layers number: </label>
-                    <input type="number" class="input-nodes form-control">
-                </div>
-                <div class="hidden-layer form-group">
-                    <label>Hidden layers number: </label>
-                    <input type="number" class="hidden-nodes form-control">
-                    <div class="append-layer" type="hidden"></div>
-                    <button class="add-hidden-layer btn btn-primary">Add hidden layer</button>
-                </div>
-
-                <div class="form-group">
-                    <label>Output layers number: </label>
-                    <input type="number" class="output-nodes form-control">
-                </div>
-            </div>
-
-            <div class="col-md-4 train-data">
-                <h3>Training data:</h3>
-                <form>
-                    <div class="form-group">
-                        <textarea rows="12" class="training-data form-control" placeholder="Training data should be in the form of a CSV with number of elements in a row corresponding to the structure of the network. (num. of input nodes + num. of output nodes)"></textarea>
-                    </div>
-                </form>
-            </div>
-
-            <div class="col-md-4 saving-data">
-                <h3>Saving the network:</h3>
-                <form>
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Will be saved in /networks">
-                        <div class="checkbox">
-                            <label><input type="checkbox" value="no-save">Don't save the network</label>
-                        </div>
-                    </div>
-                </form>
-            </div>
+    <div class="row">
+      <div class="col-md-4 network-structure">
+        <h3>Perceptron structure:</h3>
+        <div class="form-group">
+          <label>Input layers number: </label>
+          <input type="number" class="form-control" name="input-nodes">
         </div>
-        <div class="row">
-            <button class="col-md-12 btn btn-default">TRAIN</button>
+        <div class="hidden-layer form-group">
+          <label>Hidden layers number: </label>
+          <input type="number" class="form-control" name="hidden-nodes">
+          <div class="append-layer" type="hidden"></div>
+          <button class="add-hidden-layer btn btn-primary">Add hidden layer</button>
         </div>
+
+        <div class="form-group">
+          <label>Output layers number: </label>
+          <input type="number" class="form-control" name="output-nodes">
+        </div>
+      </div>
+
+      <div class="col-md-4 train-data">
+        <h3>Training data:</h3>
+        <form>
+          <div class="form-group">
+            <textarea rows="16" class="form-control" name="training-data" placeholder="Training data should be in the form of a CSV with number of elements in a row corresponding to the structure of the network. (num. of input nodes + num. of output nodes)"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="col-md-4 saving-data">
+        <h3>Parameters:</h3>
+        <form>
+          <div class="form-group">
+            <label>Learning rate:</label>
+            <input type="number" class="form-control" name="learning-rate" step="0.001" min="0.001" value="0.001">
+          </div>
+          <div class="form-group">
+            <label>Iterations:</label>
+            <input type="number" class="form-control" name="iterations" min="1" value="10000">
+          </div>
+          <div class="form-group">
+            <label>Error rate:</label>
+            <input type="number" class="form-control" name="error-rate" step="0.001" min="0.001" value="0.005">
+          </div>
+          <div class="checkbox">
+            <label><input type="checkbox" name="shuffle" value="shuffle">Shuffle</label>
+          </div>
+          <div class="form-group">
+            <label>Log every:</label>
+            <input type="number" class="form-control" name="log-rate" min="0" value="1000">
+          </div>
+          <div class="form-group">
+            <div class="checkbox">
+              <label><input type="checkbox" name="save-network">Save network</label>
+            </div>
+            <input type="hidden" name="save-network-name" class="form-control" placeholder="Will be saved in /networks">
+          </div>
+        </form>
+      </div>
     </div>
+    <div class="row">
+      <button class="train-network col-md-12 btn btn-default">TRAIN</button>
+    </div>
+  </div>
 
-    <script src="lib/imports/jquery-1.12.3.min.js"></script>
-    <script src="lib/imports/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
-    <script src="lib/imports/underscore-min.js"></script>
-    <script src="lib/imports/d3.js"></script>
-    <script src="lib/imports/synaptic.js"></script>
-    <script src="static/js/ui.js"></script>
-    <script src="script.js"></script>
+  <script src="lib/imports/jquery-1.12.3.min.js"></script>
+  <script src="lib/imports/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+  <script src="lib/imports/underscore-min.js"></script>
+  <script src="lib/imports/d3.js"></script>
+  <script src="lib/imports/synaptic.js"></script>
+  <script src="static/js/ui.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
