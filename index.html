@@ -1,33 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>JARVIS</title>
-
+    <meta charset="utf-8">
+    <title>JARVIS</title>
+    <link rel="stylesheet" href="lib/imports/bootstrap-3.3.6-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 
 <body>
-<div class="input-form">
-<label>Input layer: </label>
-<input type="number" class="input-nodes"><br/>
+    <header>
+    </header>
+    <div class="container">
+        <ul class="nav nav-pills nav-justified">
+            <li role="presentation" class="active"><a href="#">Perceptron</a></li>
+            <li role="presentation"><a href="#">LSTM</a></li>
+            <li role="presentation"><a href="#">Liquid</a></li>
+            <li role="presentation"><a href="#">Hopfield</a></li>
+        </ul>
 
-<div class="hidden-layer">
-    <label>Hidden layer: </label>
-    <input type="number" class="hidden-nodes">
-    <button class="add-hidden-layer">Add hidden layer</button><br/>
-</div>
+        <div class="row">
+            <div class="col-md-4 network-structure">
+                <h3>Perceptron structure:</h3>
+                <div class="form-group">
+                    <label>Input layers number: </label>
+                    <input type="number" class="input-nodes form-control">
+                </div>
+                <div class="hidden-layer form-group">
+                    <label>Hidden layers number: </label>
+                    <input type="number" class="hidden-nodes form-control">
+                    <div class="append-layer" type="hidden"></div>
+                    <button class="add-hidden-layer btn btn-primary">Add hidden layer</button>
+                </div>
 
-<label>Output layer: </label>
-<input type="number" class="output-nodes"><br/>
+                <div class="form-group">
+                    <label>Output layers number: </label>
+                    <input type="number" class="output-nodes form-control">
+                </div>
+            </div>
 
-<button class="create-network">Create network</button>
-</div>
+            <div class="col-md-4 train-data">
+                <h3>Training data:</h3>
+                <form>
+                    <div class="form-group">
+                        <textarea rows="12" class="training-data form-control" placeholder="Training data should be in the form of a CSV with number of elements in a row corresponding to the structure of the network. (num. of input nodes + num. of output nodes)"></textarea>
+                    </div>
+                </form>
+            </div>
 
-<script src="lib/imports/jquery-1.12.3.min.js"></script>
-<script src="lib/imports/underscore-min.js"></script>
-<script src="lib/imports/d3.js"></script>
-<script src="lib/imports/synaptic.js"></script>
-<script src="ui.js"></script>
-<script src="script.js"></script>
+            <div class="col-md-4 saving-data">
+                <h3>Saving the network:</h3>
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Will be saved in /networks">
+                        <div class="checkbox">
+                            <label><input type="checkbox" value="no-save">Don't save the network</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <button class="col-md-12 btn btn-default">TRAIN</button>
+        </div>
+    </div>
+
+    <script src="lib/imports/jquery-1.12.3.min.js"></script>
+    <script src="lib/imports/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+    <script src="lib/imports/underscore-min.js"></script>
+    <script src="lib/imports/d3.js"></script>
+    <script src="lib/imports/synaptic.js"></script>
+    <script src="static/js/ui.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

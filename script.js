@@ -2,6 +2,8 @@ function Perceptron(input, hidden, output)
 {
     // create the layers
     var inputLayer = new Layer(input);
+
+    // a perceptron can have more hidden layers
     var hiddenLayers = [];
     _.each(hidden, function (hiddenLayer) {
       var hiddenLayer = new Layer(hidden);
@@ -23,12 +25,16 @@ function Perceptron(input, hidden, output)
     });
 }
 
+// Retrieve the values in the input fields and upon those
+// create a new Perceptron network.
 function networkStructure() {
   var input = $('.input-nodes').val();
+
   var hidden = [];
   $('.hidden-nodes').each(function(el) {
     hidden.push(parseInt($(this).val()));
   });
+
   var output = $('.output-nodes').val();
 
   Perceptron.prototype = new Network();
@@ -38,7 +44,13 @@ function networkStructure() {
   return myPerceptron;
 }
 
+// RETRIEVE AND PREPARE TRAINING DATA
 
+
+// TRAIN
+
+
+// TEST / RUN THE NETWORK
 $('button.create-network').click(function() {
   var myPerceptron = networkStructure();
   var myTrainer = new Trainer(myPerceptron);
