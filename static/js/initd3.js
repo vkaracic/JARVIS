@@ -6,7 +6,7 @@ var svg,
     // increment as well.
     neuronId = 0;
 
-function drawConnections() {
+function drawConnections(loaded) {
     // Each neuron in the network had an ID which is the same as the ID of the
     // displayed neuron on the SVG. Each of the neuron objects has connections
     // properies, each of which has information from and to which neuron is the
@@ -17,7 +17,10 @@ function drawConnections() {
         _.each(n.neuron.connections.projected, function(conn) {
             var fromSvgNeuron = $('.network-display svg circle[id=' + conn.from.ID + ']');
             var toSvgNeuron = $('.network-display svg circle[id=' + conn.to.ID + ']');
-            var strokeWidth = conn.weight * 100;
+            multiplier = 100;
+            if (loaded)
+                multiplier = 1;
+            var strokeWidth = conn.weight * multiplier;
 
             svg.append('line')
                 // The connetions are the same color as the neurons since they
@@ -36,7 +39,7 @@ function drawErrorRate() {
     // TBA
 }
 
-function initNetworkSvg() {
+function initNetworkSvg(loaded) {
     svg = d3.select('.network-display svg');
     svg.selectAll("*").remove();  // Clear the SVG for a new one.
     svgWidth = parseInt(svg.attr('width'));
@@ -82,5 +85,5 @@ function initNetworkSvg() {
         }
     }
 
-    drawConnections();
+    drawConnections(loaded);
 }

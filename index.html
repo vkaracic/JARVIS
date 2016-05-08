@@ -74,15 +74,22 @@
             <label>Log every:</label>
             <input type="number" class="form-control" name="log-rate" min="0" value="1000">
           </div>
-          <div class="form-group">
-            <div class="checkbox">
-              <label><input type="checkbox" name="save-network">Save network</label>
-            </div>
-            <input type="hidden" name="save-network-name" class="form-control" placeholder="Will be saved in /networks">
-          </div>
         </form>
       </div>
     <button class="train-network col-md-12 btn-lg btn-success">TRAIN</button>
+    </div>
+
+    <h2 class="network-visualization">
+      <span class="glyphicon show-hide glyphicon-minus"></span> 
+      <span class="glyphicon show-hide glyphicon-plus hidden"></span> 
+      Save / Load Network
+    </h2>
+    <div class="row save-load">
+    <button class="save-network col-md-4 btn-lg btn-success">SAVE</button>
+    <form class="col-md-offset-2 col-md-4">
+    <textarea rows="2" class="form-control" name="load-network-content" placeholder="Enter the network in JSON format."></textarea>
+    </form>
+    <button class="load-network col-md-2 btn-lg btn-success">LOAD</button>
     </div>
 
     <h2 class="network-visualization">

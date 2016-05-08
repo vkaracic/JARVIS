@@ -5,18 +5,9 @@ $('button.add-hidden-layer').click(function() {
 });
 
 
-// Toggle the save-network field.
-$('input[name="save-network"]').change(function() {
-    var inputField = $('input[name="save-network-name"]');
-    if (inputField.attr('type') == 'hidden') {
-        inputField.attr('type', 'text');
-    } else {
-        inputField.attr('type', 'hidden');
-    };
-});
-
-
 // Show or hide a section.
+// A section with plus and minus glyphicons needs to be above
+// the content section for this to work.
 $('.glyphicon.show-hide').click(function() {
     var parent = $(this).parent();
     var content = parent.next('div');

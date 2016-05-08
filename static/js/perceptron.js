@@ -1,4 +1,4 @@
-var nn;
+
 
 function Perceptron(input, hidden, output)
 {
@@ -104,10 +104,11 @@ function testNetwork(network, input) {
   $('span.test-output').text(output);
 }
 
+var nn;
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
   nn = trainNetwork();
-  initNetworkSvg();
+  initNetworkSvg(false);
 });
 
 $('button.test-network').click(function() {
@@ -120,7 +121,11 @@ $('button.save-network').click(function() {
   var url = 'data:text/json;charset=utf8,' + encodeURIComponent(data);
   window.open(url, '_blank');
   window.focus();
-  // console.log(data);
-  // var blob = new Blob(data, {type: "application/JSON;charset=utf-8"});
-  // saveAs(blob, 'network.json');
+});
+
+// LOAD THE NETWORK
+$('button.load-network').click(function() {
+  var network = $('textarea[name=load-network-content]').val();
+  nn = Network.fromJSON(JSON.parse(network));
+  initNetworkSvg(true);
 });
