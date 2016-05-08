@@ -14,3 +14,16 @@ $('input[name="save-network"]').change(function() {
         inputField.attr('type', 'hidden');
     };
 });
+
+
+// Show or hide a section.
+$('.glyphicon.show-hide').click(function() {
+    var parent = $(this).parent();
+    var content = parent.next('div');
+    parent.find('span').toggleClass('hidden');
+    if (parent.find('.glyphicon-minus').hasClass('hidden')) {
+        content.hide(200);
+    } else {
+        content.show(200);
+    }
+});

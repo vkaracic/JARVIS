@@ -1,3 +1,5 @@
+var nn;
+
 function Perceptron(input, hidden, output)
 {
     // create the layers
@@ -103,7 +105,6 @@ function testNetwork(network, input) {
 }
 
 // TEST / RUN THE NETWORK
-var nn;
 $('button.train-network').click(function() {
   nn = trainNetwork();
   initNetworkSvg();
@@ -111,4 +112,15 @@ $('button.train-network').click(function() {
 
 $('button.test-network').click(function() {
   testNetwork(nn, $('input[name=test-input]').val().split(','));
+});
+
+// SAVE THE NETWORK
+$('button.save-network').click(function() {
+  var data = JSON.stringify(nn.toJSON());
+  var url = 'data:text/json;charset=utf8,' + encodeURIComponent(data);
+  window.open(url, '_blank');
+  window.focus();
+  // console.log(data);
+  // var blob = new Blob(data, {type: "application/JSON;charset=utf-8"});
+  // saveAs(blob, 'network.json');
 });

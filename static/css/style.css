@@ -2,12 +2,16 @@ header {
     min-height: 100px;
 }
 
-.network-structure input[name=hidden-nodes] {
-    margin-bottom: 10px;
+.glyphicon:hover {
+    cursor: pointer;
 }
 
-.network-testing {
-    margin-top: 50px;
+.hidden {
+    display: none;
+}
+
+.network-structure input[name=hidden-nodes] {
+    margin-bottom: 10px;
 }
 
 .network-testing form {
@@ -16,7 +20,9 @@ header {
 }
 
 .network-testing label {
+
     margin-right: 10px;
+
 }
 
 .network-testing input {
