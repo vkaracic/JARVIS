@@ -107,6 +107,7 @@ function testNetwork(network, input) {
 var nn;
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
+  drawErrorRateGraphCanvas();
   nn = trainNetwork();
   initNetworkSvg(false);
 });

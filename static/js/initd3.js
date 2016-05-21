@@ -6,6 +6,15 @@ var svg,
     // increment as well.
     neuronId = 0;
 
+var errorSvg,
+    errorSvgWidth,
+    errorSvgHeight,
+    xAxisTicks = 0,
+    currentX = 0,
+    yNorm = 0,
+    previous = 0;
+
+
 function drawConnections(loaded) {
     // Each neuron in the network had an ID which is the same as the ID of the
     // displayed neuron on the SVG. Each of the neuron objects has connections
@@ -35,13 +44,76 @@ function drawConnections(loaded) {
     });
 }
 
-function drawErrorRate() {
-    // TBA
+// Remove all the elements from the error rate graph canvas and re-initialize values.
+function clearErrorRateGraphCanvas() {
+    errorSvg = d3.select('.error-graph svg');
+    errorSvg.selectAll('*').remove();
+    xAxisTicks = 0;
+    currentX = 0;
+    yNorm = 0;
+    previous = 0;
+}
+
+// Draws one tick on the error rate graph. This function needs to be called
+// in this block: https://github.com/cazala/synaptic/blob/master/src/trainer.js#L111
+function drawErrorRateTick(error) {
+    // Calculate the normalization factor for Y axis.
+    if (yNorm === 0)
+        yNorm = errorSvgHeight / error;
+    // Normalize Y axis and invert.
+    var tick = errorSvgHeight - error * yNorm;
+
+    if (previous === 0) {
+        previous = {
+            x: 0,
+            y: 0,
+        };
+    } else {
+        errorSvg.append('line')
+            .attr('x1', previous.x)
+            .attr('y1', previous.y)
+            .attr('x2', currentX)
+            .attr('y2', tick)
+            .attr('stroke', 'blue')
+            .attr('stroke-width', 2);
+        previous.x = currentX;
+        previous.y = tick;
+    }
+    currentX = currentX + xAxisTicks;
+}
+
+// Draw the error rate graph canvas axes and calculate
+// the need values for the graph to display.
+function drawErrorRateGraphCanvas() {
+    clearErrorRateGraphCanvas();
+    errorSvg = d3.select('.error-graph svg');
+    errorSvgWidth = parseInt(errorSvg.attr('width')),
+    errorSvgHeight = parseInt(errorSvg.attr('height'));
+    var logRate = parseInt($('input[name=log-rate]').val());
+    var iterations = parseInt($('input[name=iterations]').val());
+    xAxisTicks = errorSvgWidth / (iterations / logRate);
+    // Y axis
+    errorSvg.append('line')
+        .attr('x1', 0)
+        .attr('y1', 0)
+        .attr('x2', 0)
+        .attr('y2', errorSvgHeight)
+        .attr('stroke', 'gray')
+        .attr('stroke-width', 2);
+    // X axis
+    errorSvg.append('line')
+        .attr('x1', 0)
+        .attr('y1', errorSvgHeight)
+        .attr('x2', errorSvgWidth)
+        .attr('y2', errorSvgHeight)
+        .attr('stroke', 'gray')
+        .attr('stroke-width', 2);
+
 }
 
 function initNetworkSvg(loaded) {
     svg = d3.select('.network-display svg');
-    svg.selectAll("*").remove();  // Clear the SVG for a new one.
+    svg.selectAll('*').remove();  // Clear the SVG for a new one.
     svgWidth = parseInt(svg.attr('width'));
     svgHeight = parseInt(svg.attr('height'));
 
@@ -80,7 +152,7 @@ function initNetworkSvg(loaded) {
                 .attr('r', 20)
                 .attr('id', neuronId)
                 .attr('layer', layer)
-                .style('fill', 'red')
+                .style('fill', 'red');
             neuronId++;
         }
     }
