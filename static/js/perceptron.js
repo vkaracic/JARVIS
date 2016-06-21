@@ -77,11 +77,12 @@ function trainNetwork() {
   var myTrainer = new Trainer(myPerceptron);
   var trainingData = trainingSet();
 
-  var rate = parseFloat($('input[name=learning-rate]').val());
-  var iterations = parseInt($('input[name=iterations]').val());
-  var error = parseFloat($('input[name=error-rate]').val());
-  var shuffle = $('input[name="shuffle"]').is(':checked');
-  var log = parseInt($('input[name=log-rate]').val());
+  var rate = parseFloat($('input[name=learning-rate]').val()),
+      iterations = parseInt($('input[name=iterations]').val()),
+      error = parseFloat($('input[name=error-rate]').val()),
+      shuffle = $('input[name="shuffle"]').is(':checked'),
+      log = parseInt($('input[name=log-rate]').val()),
+      cost = $('select[name=cost]').val();
 
   myTrainer.train(trainingData, {
     rate: rate,
@@ -89,8 +90,15 @@ function trainNetwork() {
     error: error,
     shuffle: shuffle,
     log: log,
+    cost: Trainer.cost[cost],
+    schedule: {
+      every: 50,
+      do: function(data) {
+          errorList.push(data.error);
+      }
+    }
   });
-  
+  drawErrorRateGraphCanvas();
   return myPerceptron;
 }
 
@@ -107,7 +115,6 @@ function testNetwork(network, input) {
 var nn;
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
-  drawErrorRateGraphCanvas();
   nn = trainNetwork();
   initNetworkSvg(false);
 });

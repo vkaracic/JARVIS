@@ -7,9 +7,11 @@ var svg,
     neuronId = 0;
 
 var errorSvg,
+    errorList = [],
+    normFactor,
     errorSvgWidth,
     errorSvgHeight,
-    xAxisTicks = 0,
+    tickFrequency = 0,
     currentX = 0,
     yNorm = 0,
     previous = 0;
@@ -54,14 +56,15 @@ function clearErrorRateGraphCanvas() {
     previous = 0;
 }
 
+function appendToErrorList(error) {
+    errorList.push(error);
+}
+
 // Draws one tick on the error rate graph. This function needs to be called
 // in this block: https://github.com/cazala/synaptic/blob/master/src/trainer.js#L111
 function drawErrorRateTick(error) {
-    // Calculate the normalization factor for Y axis.
-    if (yNorm === 0)
-        yNorm = errorSvgHeight / error;
     // Normalize Y axis and invert.
-    var tick = errorSvgHeight - error * yNorm;
+    var tick = error * normFactor;
 
     if (previous === 0) {
         previous = {
@@ -79,7 +82,7 @@ function drawErrorRateTick(error) {
         previous.x = currentX;
         previous.y = tick;
     }
-    currentX = currentX + xAxisTicks;
+    currentX = currentX + tickFrequency;
 }
 
 // Draw the error rate graph canvas axes and calculate
@@ -91,7 +94,12 @@ function drawErrorRateGraphCanvas() {
     errorSvgHeight = parseInt(errorSvg.attr('height'));
     var logRate = parseInt($('input[name=log-rate]').val());
     var iterations = parseInt($('input[name=iterations]').val());
-    xAxisTicks = errorSvgWidth / (iterations / logRate);
+    if (errorList.length < errorSvgWidth) {
+        tickFrequency = 1;
+    } else {
+        tickFrequency = errorList.length / errorSvgWidth;
+    }
+    normFactor = errorSvgHeight / _.max(errorList);
     // Y axis
     errorSvg.append('line')
         .attr('x1', 0)
@@ -108,6 +116,13 @@ function drawErrorRateGraphCanvas() {
         .attr('y2', errorSvgHeight)
         .attr('stroke', 'gray')
         .attr('stroke-width', 2);
+
+    _.each(errorList, function(val, i) {
+        if (!(i % tickFrequency)) {
+            console.log("TICKED");
+            drawErrorRateTick(val);
+        }
+    });
 
 }
 

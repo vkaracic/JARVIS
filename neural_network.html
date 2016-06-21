@@ -82,6 +82,14 @@
             <label><input type="checkbox" name="shuffle" value="shuffle">Shuffle</label>
           </div>
           <div class="form-group">
+            <label>Cost</label>
+            <select class="form-control" name="cost">
+              <option>ENTROPY</option>
+              <option>MSE</option>
+              <option>BINARY</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label>Log every:</label>
             <input type="number" class="form-control" name="log-rate" min="0" value="1000">
           </div>
