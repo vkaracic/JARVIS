@@ -112,6 +112,14 @@ function drawErrorRateGraphCanvas() {
         .attr('y2', errorSvgHeight)
         .attr('stroke', 'gray')
         .attr('stroke-width', 2);
+    errorSvg.append('text')
+        .attr('class', 'rotate')
+        .attr('x', 120)
+        .attr('y', -5)
+        .style('font-size', '16px')
+        .style('fill', '#B6B6B6')
+        .text('Error rate');
+
     // X axis
     errorSvg.append('line')
         .attr('x1', 0)
@@ -120,6 +128,12 @@ function drawErrorRateGraphCanvas() {
         .attr('y2', errorSvgHeight)
         .attr('stroke', 'gray')
         .attr('stroke-width', 2);
+    errorSvg.append('text')
+        .attr('x', 180)
+        .attr('y', 290)
+        .style('font-size', '16px')
+        .style('fill', '#B6B6B6')
+        .text('Epochs');
 
     _.each(errorList, function(val, i) {
         if ((i % tickFrequency) === 0) {
