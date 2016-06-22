@@ -12,6 +12,7 @@ var errorSvg,
     errorSvgWidth,
     errorSvgHeight,
     tickFrequency = 0,
+    tickWidth,
     currentX = 0,
     yNorm = 0,
     previous = 0;
@@ -64,7 +65,7 @@ function appendToErrorList(error) {
 // in this block: https://github.com/cazala/synaptic/blob/master/src/trainer.js#L111
 function drawErrorRateTick(error) {
     // Normalize Y axis and invert.
-    var tick = error * normFactor;
+    var tick = errorSvgHeight - error * normFactor;
 
     if (previous === 0) {
         previous = {
@@ -78,11 +79,12 @@ function drawErrorRateTick(error) {
             .attr('x2', currentX)
             .attr('y2', tick)
             .attr('stroke', 'blue')
-            .attr('stroke-width', 2);
+            .attr('stroke-width', 2)
+            .attr('error', error);
         previous.x = currentX;
         previous.y = tick;
     }
-    currentX = currentX + tickFrequency;
+    currentX = currentX + tickWidth;
 }
 
 // Draw the error rate graph canvas axes and calculate
@@ -96,8 +98,10 @@ function drawErrorRateGraphCanvas() {
     var iterations = parseInt($('input[name=iterations]').val());
     if (errorList.length < errorSvgWidth) {
         tickFrequency = 1;
+        tickWidth = Math.floor(errorSvgWidth / errorList.length);
     } else {
-        tickFrequency = errorList.length / errorSvgWidth;
+        tickFrequency = Math.floor(errorList.length / errorSvgWidth); // Needs to be an integer.
+        tickWidth = 1;
     }
     normFactor = errorSvgHeight / _.max(errorList);
     // Y axis
@@ -118,12 +122,11 @@ function drawErrorRateGraphCanvas() {
         .attr('stroke-width', 2);
 
     _.each(errorList, function(val, i) {
-        if (!(i % tickFrequency)) {
-            console.log("TICKED");
+        if ((i % tickFrequency) === 0) {
             drawErrorRateTick(val);
         }
     });
-
+    console.log('Errors available in `errorList` array.');
 }
 
 function initNetworkSvg(loaded) {
