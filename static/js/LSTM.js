@@ -43,18 +43,12 @@ function LSTM(input, blocks, output)
 // CREATE THE NETWORK
 function networkStructure() {
   var input = parseInt($('input[name=input-nodes]').val());
-
-  var blocks = [];
-  $('input[name=hidden-nodes]').each(function(el) {
-    if ($(this).val())
-      blocks.push(parseInt($(this).val()));
-  });
+  var blocks = parseInt($('input[name=blocks]').val());
   var output = parseInt($('input[name=output-nodes]').val());
 
   LSTM.prototype = new Network();
   LSTM.prototype.constructor = LSTM;
-  var returnLSTM = new LSTM(input, blocks, output);
-  return returnLSTM;
+  return new LSTM(input, blocks, output);
 }
 
 // RETRIEVE AND PREPARE TRAINING DATA
@@ -73,11 +67,11 @@ function trainingSet() {
 
     // training data items count has to be same
     // as input_nodes+output_nodes count.
-    if (values.length > dataRowLen)
-      throw 'Inconsistent training data';
+    // if (values.length > dataRowLen)
+    //   throw 'Inconsistent training data';
 
     trainSet.push({
-      'input': _.first(values, inputNum),
+      'input': _.first(values, values.length - outputNum),
       'output': _.last(values, outputNum)
     })
   });
@@ -129,7 +123,6 @@ var nn;
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
   nn = trainNetwork();
-  initNetworkSvg(false);
 });
 
 $('button.test-network').click(function() {
@@ -148,5 +141,4 @@ $('button.save-network').click(function() {
 $('button.load-network').click(function() {
   var network = $('textarea[name=load-network-content]').val();
   nn = Network.fromJSON(JSON.parse(network));
-  initNetworkSvg(true);
 });
