@@ -18,7 +18,7 @@ var errorSvg,
     previous = 0;
 
 
-function drawConnections(loaded) {
+function drawConnections() {
     // Each neuron in the network had an ID which is the same as the ID of the
     // displayed neuron on the SVG. Each of the neuron objects has connections
     // properies, each of which has information from and to which neuron is the
@@ -29,10 +29,7 @@ function drawConnections(loaded) {
         _.each(n.neuron.connections.projected, function(conn) {
             var fromSvgNeuron = $('.network-display svg circle[id=' + conn.from.ID + ']');
             var toSvgNeuron = $('.network-display svg circle[id=' + conn.to.ID + ']');
-            multiplier = 100;
-            if (loaded)
-                multiplier = 1;
-            var strokeWidth = conn.weight * multiplier;
+            var strokeWidth = conn.weight;
 
             svg.append('line')
                 // The connetions are the same color as the neurons since they
@@ -61,8 +58,7 @@ function appendToErrorList(error) {
     errorList.push(error);
 }
 
-// Draws one tick on the error rate graph. This function needs to be called
-// in this block: https://github.com/cazala/synaptic/blob/master/src/trainer.js#L111
+// Draws one tick on the error rate graph.
 function drawErrorRateTick(error) {
     // Normalize Y axis and invert.
     var tick = errorSvgHeight - error * normFactor;
@@ -143,7 +139,7 @@ function drawErrorRateGraphCanvas() {
     console.log('Errors available in `errorList` array.');
 }
 
-function initNetworkSvg(loaded) {
+function initNetworkSvg() {
     svg = d3.select('.network-display svg');
     svg.selectAll('*').remove();  // Clear the SVG for a new one.
     svgWidth = parseInt(svg.attr('width'));
@@ -189,5 +185,5 @@ function initNetworkSvg(loaded) {
         }
     }
 
-    drawConnections(loaded);
+    drawConnections();
 }

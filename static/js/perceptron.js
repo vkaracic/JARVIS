@@ -84,6 +84,7 @@ function trainNetwork() {
       log = parseInt($('input[name=log-rate]').val()),
       cost = $('select[name=cost]').val();
 
+  myPerceptron.setOptimize(false);
   myTrainer.train(trainingData, {
     rate: rate,
     iterations: iterations,
@@ -116,7 +117,7 @@ var nn;
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
   nn = trainNetwork();
-  initNetworkSvg(false);
+  initNetworkSvg();
 });
 
 $('button.test-network').click(function() {
@@ -135,5 +136,5 @@ $('button.save-network').click(function() {
 $('button.load-network').click(function() {
   var network = $('textarea[name=load-network-content]').val();
   nn = Network.fromJSON(JSON.parse(network));
-  initNetworkSvg(true);
+  initNetworkSvg();
 });
