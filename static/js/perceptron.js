@@ -81,7 +81,6 @@ function trainNetwork() {
       iterations = parseInt($('input[name=iterations]').val()),
       error = parseFloat($('input[name=error-rate]').val()),
       shuffle = $('input[name="shuffle"]').is(':checked'),
-      log = parseInt($('input[name=log-rate]').val()),
       cost = $('select[name=cost]').val();
 
   myPerceptron.setOptimize(false);
@@ -90,7 +89,6 @@ function trainNetwork() {
     iterations: iterations,
     error: error,
     shuffle: shuffle,
-    log: log,
     cost: Trainer.cost[cost],
     schedule: {
       every: 50,
