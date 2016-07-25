@@ -1,5 +1,3 @@
-
-
 function LSTM(input, blocks, output)
 {
     // create the layers
@@ -65,11 +63,6 @@ function trainingSet() {
   _.forEach(trainingData, function(train_row) {
     var values = train_row.split(',');
 
-    // training data items count has to be same
-    // as input_nodes+output_nodes count.
-    // if (values.length > dataRowLen)
-    //   throw 'Inconsistent training data';
-
     trainSet.push({
       'input': _.first(values, values.length - outputNum),
       'output': _.last(values, outputNum)
@@ -110,11 +103,6 @@ function trainNetwork() {
 }
 
 function testNetwork(network, input) {
-  // Input list should contain as many elements
-  // as there are input nodes on the network.
-  if (network.layers.input.size != input.length)
-    throw new Error('Inconsistent data size!');
-
   var output = network.activate(input);
   $('span.test-output').text(output);
 }
