@@ -194,6 +194,7 @@ function initNetworkSvg() {
 }
 
 function drawNeurons(list) {
+    var text_x, text_y;
     svg = d3.select('.network-display svg');
     _.each(list, function(neuron) {
         svg.append('circle')
@@ -202,5 +203,19 @@ function drawNeurons(list) {
             .attr('r', 20)
             .attr('id', neuron.id)
             .style('fill', 'red');
+        if (neuron.id < 10) {
+            text_x = neuron.x - 5;
+        } else {
+            text_x = neuron.x - 10;
+        }
+        text_y = neuron.y + 5;
+        svg.append('text')
+            .attr('x', text_x)
+            .attr('y', text_y)
+            .style('font-size', '16px')
+            .style('font-weight', '700')
+            .style('fill', '#FFFFFF')
+            .text(neuron.id);
     });
+
 }
