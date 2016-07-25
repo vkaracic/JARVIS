@@ -14,32 +14,48 @@ var errorSvg,
     tickFrequency = 0,
     tickWidth,
     currentX = 0,
-    yNorm = 0,
     previous = 0;
 
 
-function drawConnections() {
+function drawConnections(list) {
     // Each neuron in the network had an ID which is the same as the ID of the
     // displayed neuron on the SVG. Each of the neuron objects has connections
     // properies, each of which has information from and to which neuron is the
     // connection linked and it's weight (among other things).
     // Here we are using the 'projected' connections and display only connections
-    // that the neuron projects instead of 'inputs'.
+    // that the neuron projects.
+
+    // Tooltip element initialization.
+    var div = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
     _.each(nn.neurons(), function(n) {
         _.each(n.neuron.connections.projected, function(conn) {
-            var fromSvgNeuron = $('.network-display svg circle[id=' + conn.from.ID + ']');
-            var toSvgNeuron = $('.network-display svg circle[id=' + conn.to.ID + ']');
+            var fromSvgNeuron = list[conn.from.ID];
+            var toSvgNeuron = list[conn.to.ID];
             var strokeWidth = conn.weight;
 
             svg.append('line')
-                // The connetions are the same color as the neurons since they
-                // are painted over the neurons (d3 assigns higher z-index).
                 .attr('stroke', 'red')
                 .attr('stroke-width', strokeWidth)
-                .attr('x1', fromSvgNeuron.attr('cx'))
-                .attr('y1', fromSvgNeuron.attr('cy'))
-                .attr('x2', toSvgNeuron.attr('cx'))
-                .attr('y2', toSvgNeuron.attr('cy'));
+                .attr('x1', fromSvgNeuron.x)
+                .attr('y1', fromSvgNeuron.y)
+                .attr('x2', toSvgNeuron.x)
+                .attr('y2', toSvgNeuron.y)
+                .text('test123')
+                .on('mouseover', function() {
+                    div.transition()
+                        .duration(500)  
+                        .style("opacity", 0);
+                    div.transition()
+                        .duration(200)  
+                        .style("opacity", 0.9);  
+                    div .html('<p>' + strokeWidth + '</p>')
+                        .style("left", (d3.event.pageX) + "px")          
+                        .style("top", (d3.event.pageY - 28) + "px");
+                });
         });
     });
 }
@@ -50,17 +66,12 @@ function clearErrorRateGraphCanvas() {
     errorSvg.selectAll('*').remove();
     xAxisTicks = 0;
     currentX = 0;
-    yNorm = 0;
     previous = 0;
-}
-
-function appendToErrorList(error) {
-    errorList.push(error);
 }
 
 // Draws one tick on the error rate graph.
 function drawErrorRateTick(error) {
-    // Normalize Y axis and invert.
+    // Normalize Y axis and invert so that the graph starts from top left.
     var tick = errorSvgHeight - error * normFactor;
 
     if (previous === 0) {
@@ -84,11 +95,11 @@ function drawErrorRateTick(error) {
 }
 
 // Draw the error rate graph canvas axes and calculate
-// the need values for the graph to display.
+// the needed values for the graph to display.
 function drawErrorRateGraphCanvas() {
     clearErrorRateGraphCanvas();
     errorSvg = d3.select('.error-graph svg');
-    errorSvgWidth = parseInt(errorSvg.attr('width')),
+    errorSvgWidth = parseInt(errorSvg.attr('width'));
     errorSvgHeight = parseInt(errorSvg.attr('height'));
     var logRate = parseInt($('input[name=log-rate]').val());
     var iterations = parseInt($('input[name=iterations]').val());
@@ -145,8 +156,9 @@ function initNetworkSvg() {
     svgWidth = parseInt(svg.attr('width'));
     svgHeight = parseInt(svg.attr('height'));
 
-    var input_nodes = nn.layers.input.size;
-    var output_nodes = nn.layers.output.size;
+    var neuron_list = [],
+        input_nodes = nn.layers.input.size,
+        output_nodes = nn.layers.output.size;
 
     var hidden_nodes = [];
     _.forEach(nn.layers.hidden, function(layer) {
@@ -157,33 +169,34 @@ function initNetworkSvg() {
     var widthOffset = svgWidth / (layerNum.length * 2);
 
     for (var i=0; i<layerNum.length; i++) {
-        var layer;
-        // Input layer neurons have their layer attribute set to 'input',
-        // output layer neurons to 'output' and hidden ones are enumerated.
-        if (i==0) {
-            layer = 'input';
-        } else if (i==layerNum.length-1) {
-            layer = 'output';
-        } else {
-            layer = i-1;
-        }
-
         // Draw the neural network with an offset for the edged neurons
         // so that network is always in the center.
         for (var j=0; j<layerNum[i]; j++) {
             // Height offset depends on the number of neurons in each layer
             // so it can't be set outside the loop.
             var heightOffset = svgHeight / (layerNum[i] * 2);
-            svg.append('circle')
-                .attr('cx', widthOffset + (svgWidth/layerNum.length) * i)
-                .attr('cy', heightOffset + (svgHeight/layerNum[i]) * j)
-                .attr('r', 20)
-                .attr('id', neuronId)
-                .attr('layer', layer)
-                .style('fill', 'red');
+
+            neuron_list.push({
+                x: widthOffset + (svgWidth/layerNum.length) * i,
+                y: heightOffset + (svgHeight/layerNum[i]) * j,
+                id: neuronId,
+                bias: nn.neurons()[neuronId].neuron.bias
+            });
             neuronId++;
         }
     }
+    drawConnections(neuron_list);
+    drawNeurons(neuron_list);
+}
 
-    drawConnections();
+function drawNeurons(list) {
+    svg = d3.select('.network-display svg');
+    _.each(list, function(neuron) {
+        svg.append('circle')
+            .attr('cx', neuron.x)
+            .attr('cy', neuron.y)
+            .attr('r', 20)
+            .attr('id', neuron.id)
+            .style('fill', 'red');
+    });
 }
