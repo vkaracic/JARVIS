@@ -33,8 +33,8 @@ function drawConnections(list) {
 
     _.each(nn.neurons(), function(n) {
         _.each(n.neuron.connections.projected, function(conn) {
-            var fromSvgNeuron = list[conn.from.ID];
-            var toSvgNeuron = list[conn.to.ID];
+            var fromSvgNeuron = list[conn.from.ID - (neuronId - list.length)];
+            var toSvgNeuron = list[conn.to.ID - (neuronId - list.length)];
             var strokeWidth = conn.weight;
 
             svg.append('line')
@@ -180,7 +180,11 @@ function initNetworkSvg() {
                 x: widthOffset + (svgWidth/layerNum.length) * i,
                 y: heightOffset + (svgHeight/layerNum[i]) * j,
                 id: neuronId,
-                bias: nn.neurons()[neuronId].neuron.bias
+                bias: _.find(nn.neurons(), function(n) {
+                    if (parseInt(n.neuron.ID) === neuronId) {
+                        return n.neuron.bias;
+                    }
+                })
             });
             neuronId++;
         }

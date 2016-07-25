@@ -84,6 +84,7 @@ function trainNetwork() {
       cost = $('select[name=cost]').val();
 
   myPerceptron.setOptimize(false);
+  errorList = [];
   myTrainer.train(trainingData, {
     rate: rate,
     iterations: iterations,
