@@ -25,12 +25,6 @@ function drawConnections(list) {
     // Here we are using the 'projected' connections and display only connections
     // that the neuron projects.
 
-    // Tooltip element initialization.
-    var div = d3.select("body")
-        .append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-
     _.each(nn.neurons(), function(n) {
         _.each(n.neuron.connections.projected, function(conn) {
             var fromSvgNeuron = list[conn.from.ID - (neuronId - list.length)];
@@ -44,18 +38,6 @@ function drawConnections(list) {
                 .attr('y1', fromSvgNeuron.y)
                 .attr('x2', toSvgNeuron.x)
                 .attr('y2', toSvgNeuron.y)
-                .text('test123')
-                .on('mouseover', function() {
-                    div.transition()
-                        .duration(500)  
-                        .style("opacity", 0);
-                    div.transition()
-                        .duration(200)  
-                        .style("opacity", 0.9);  
-                    div .html('<p>' + strokeWidth + '</p>')
-                        .style("left", (d3.event.pageX) + "px")          
-                        .style("top", (d3.event.pageY - 28) + "px");
-                });
         });
     });
 }
@@ -150,6 +132,17 @@ function drawErrorRateGraphCanvas() {
     console.log('Errors available in `errorList` array.');
 }
 
+function findBias(id) {
+    var bias = 0;
+    _.each(nn.neurons(), function(n) {
+        if (parseInt(n.neuron.ID) === neuronId) {
+            bias = n.neuron.bias;
+        }
+    });
+
+    return bias;
+}
+
 function initNetworkSvg() {
     svg = d3.select('.network-display svg');
     svg.selectAll('*').remove();  // Clear the SVG for a new one.
@@ -180,11 +173,7 @@ function initNetworkSvg() {
                 x: widthOffset + (svgWidth/layerNum.length) * i,
                 y: heightOffset + (svgHeight/layerNum[i]) * j,
                 id: neuronId,
-                bias: _.find(nn.neurons(), function(n) {
-                    if (parseInt(n.neuron.ID) === neuronId) {
-                        return n.neuron.bias;
-                    }
-                })
+                bias: findBias(neuronId)
             });
             neuronId++;
         }
@@ -196,6 +185,12 @@ function initNetworkSvg() {
 
 function drawNeurons(list) {
     var text_x, text_y;
+
+    var div = d3.select("body")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
     svg = d3.select('.network-display svg');
     _.each(list, function(neuron) {
         svg.append('circle')
@@ -203,7 +198,18 @@ function drawNeurons(list) {
             .attr('cy', neuron.y)
             .attr('r', 20)
             .attr('id', neuron.id)
-            .style('fill', 'red');
+            .style('fill', 'red')
+            .on('mouseover', function() {
+                div.transition()
+                    .duration(500)  
+                    .style("opacity", 0);
+                div.transition()
+                    .duration(200)  
+                    .style("opacity", 0.9);  
+                div .html('<p>' + neuron.bias + '</p>')
+                    .style("left", (d3.event.pageX) + "px")          
+                    .style("top", (d3.event.pageY - 28) + "px");
+            });
         if (neuron.id < 10) {
             text_x = neuron.x - 5;
         } else {
