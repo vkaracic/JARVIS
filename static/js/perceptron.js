@@ -1,4 +1,4 @@
-
+var nn;
 
 function Perceptron(input, hidden, output)
 {
@@ -104,17 +104,30 @@ function trainNetwork() {
   return myPerceptron;
 }
 
-function testNetwork(network, input) {
-  // Input list should contain as many elements
-  // as there are input nodes on the network.
-  if (network.layers.input.size != input.length)
-    throw new Error('Inconsistent data size!');
 
-  var output = network.activate(input);
-  $('span.test-output').text(output);
+function addToResultTable(data) {
+  var total_variance = 0;
+  _.each(data, function(el) {
+    total_variance += el.variance;
+    $('table.test-output tr:last').after(
+      '<tr><td>'+
+      el.input+
+      '</td><td>'+
+      el.result+
+      '</td><td>'+
+      el.expected+
+      '</td><td>'+
+      el.variance+
+      '</td></tr>'
+    );
+  });
+
+  $('table.test-output tr:last').after(
+    '<tr class="active"><td colspan="3">Average variance</td>'+
+    '<td>' + (total_variance / data.length) + '</td></tr>'
+  );
 }
 
-var nn;
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
   nn = trainNetwork();
@@ -122,7 +135,27 @@ $('button.train-network').click(function() {
 });
 
 $('button.test-network').click(function() {
-  testNetwork(nn, $('input[name=test-input]').val().split(','));
+  var testingData = $("textarea[name=test-data]").val().split('\n');
+  var inputNum = parseInt($('input[name=input-nodes]').val());
+  var outputNum = parseInt($('input[name=output-nodes]').val());
+  var dataRowLen = inputNum + outputNum;
+  var trainingResults = [],
+      output;
+
+  _.forEach(testingData, function(row) {
+    var values = row.split(',');
+    if (values.length > dataRowLen + 1)
+      throw 'Inconsistent testing data!';
+    output = nn.activate(_.first(values, inputNum));
+    trainingResults.push({
+      input: values,
+      result: output,
+      expected: values[values.length - 1],
+      variance: Math.abs(values[values.length - 1] - output)
+    });
+  });
+
+  addToResultTable(trainingResults);
 });
 
 // SAVE THE NETWORK
