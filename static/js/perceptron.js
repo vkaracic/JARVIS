@@ -9,15 +9,17 @@ function Perceptron(input, hidden, output)
     var hiddenLayers = [];
     _.each(hidden, function (neuronNum) {
       var hiddenLayer = new Layer(neuronNum);
+
       hiddenLayers.push(hiddenLayer);
     });
     var outputLayer = new Layer(output);
 
     // connect the layers
-    _.each(hiddenLayers, function (hiddenLayer) {
-      inputLayer.project(hiddenLayer);
-      hiddenLayer.project(outputLayer);
-    });
+    inputLayer.project(hiddenLayers[0]);
+    for (i = 1; i < hiddenLayers.length; i++) {
+      hiddenLayers[i-1].project(hiddenLayers[i]);
+    }
+    hiddenLayers[hiddenLayers.length - 1].project(outputLayer);
 
     // set the layers
     this.set({
@@ -66,7 +68,7 @@ function trainingSet() {
     trainSet.push({
       'input': _.first(values, inputNum),
       'output': _.last(values, outputNum)
-    })
+    });
   });
 
   return trainSet;
