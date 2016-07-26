@@ -3,7 +3,7 @@
  */ 
 var nn;
 
-/* Creates the perceptron structure of the network.
+/* Creates the perceptron network.
  * 
  * @param {number} input: Number of input nodes.
  * @param {array} hidden: Array containing the number of neurons for each hidden layer.
@@ -65,6 +65,10 @@ function networkStructure() {
  *
  * @returns {array} trainSet: The training data set containing the inputs
  *                            and targeted outputs.
+ * 
+ * @raises 'Inconsistent training data': The training data rows need to consist
+ *                            of the exact amount of input values as there are input
+ *                            nodes and an output value.
  */
 function trainingSet() {
   var inputNum = parseInt($('input[name=input-nodes]').val()),
@@ -109,7 +113,7 @@ function trainNetwork() {
   errorList = [];
   myTrainer.train(trainingData, {
     rate: rate,
-    iterations: iterations,
+    iterations: iterations, 
     error: error,
     shuffle: shuffle,
     cost: Trainer.cost[cost],
@@ -129,10 +133,10 @@ function trainNetwork() {
  * @param {array} data: Array of test result data.
  */
 function addToResultTable(data) {
-  var total_variance = 0;
+  var totalVariance = 0;
 
   _.each(data, function(el) {
-    total_variance += el.variance;
+    totalVariance += el.variance;
     $('table.test-output tr:last').after(
       '<tr><td>'+
       el.input+
@@ -148,7 +152,7 @@ function addToResultTable(data) {
 
   $('table.test-output tr:last').after(
     '<tr class="active"><td colspan="3">Average variance</td>'+
-    '<td>' + (total_variance / data.length) + '</td></tr>'
+    '<td>' + (totalVariance / data.length) + '</td></tr>'
   );
 }
 
@@ -199,7 +203,7 @@ $('button.save-network').click(function() {
 // LOAD THE NETWORK
 $('button.load-network').click(function() {
   var network = $('textarea[name=load-network-content]').val(),
-      loaded_network = JSON.parse(network);
-  nn = Network.fromJSON(loaded_network);
+      loadedNetwork = JSON.parse(network);
+  nn = Network.fromJSON(loadedNetwork);
   initNetworkSvg(loaded_network.connections);
 });

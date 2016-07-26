@@ -1,25 +1,35 @@
-function LSTM(input, blocks, output)
-{
+var nn;
+
+/* Create an LSTM network.
+ *
+ * @param {number} input: Number of input nodes.
+ * @param {number} blocks: Number of memory cells.
+ * @param {number} output: Number of output nodes.
+ */
+function LSTM(input, blocks, output) {
     // create the layers
     var inputLayer = new Layer(input),
-        inputGate = new Layer(blocks),
-        outputGate = new Layer(blocks),
-        forgetGate = new Layer(blocks),
-        memoryCell = new Layer(blocks),
-        outputLayer = new Layer(output);
+        inputGate = new Layer(blocks , 'inputGate'),
+        outputGate = new Layer(blocks, 'outputGate'),
+        forgetGate = new Layer(blocks, 'forgetGate'),
+        memoryCell = new Layer(blocks, 'memoryCell'),
+        outputLayer = new Layer(output),
+        input,
+        output,
+        self;
 
     // input layer connections
-    var input = inputLayer.project(memoryCell);
+    input = inputLayer.project(memoryCell);
     inputLayer.project(inputGate);
     inputLayer.project(outputGate);
     inputLayer.project(forgetGate);
     inputLayer.project(outputLayer);
 
     // memory cell connections
-    var output = memoryCell.project(outputLayer);
+    output = memoryCell.project(outputLayer);
 
     // self connection
-    var self = memoryCell.project(memoryCell);
+    self = memoryCell.project(memoryCell);
 
     memoryCell.project(inputGate);
     memoryCell.project(outputGate);
@@ -38,7 +48,10 @@ function LSTM(input, blocks, output)
     });
 }
 
-// CREATE THE NETWORK
+/* Create the network.
+ *
+ * @returns {Object} LSTM: network object.
+ */
 function networkStructure() {
   var input = parseInt($('input[name=input-nodes]').val());
   var blocks = parseInt($('input[name=blocks]').val());
@@ -49,20 +62,24 @@ function networkStructure() {
   return new LSTM(input, blocks, output);
 }
 
-// RETRIEVE AND PREPARE TRAINING DATA
-// The format of the train set has to be a list of objects, each with
-// 'input' property that is a list of input values, and 'output' that is
-// also a list of output values.
+/*
+ * The format of the train set has to be a list of objects, each with
+ * 'input' property that is a list of input values, and 'output' that is
+ * also a list of output values.
+ *
+ * @returns {array} trainSet: The training data set containing the inputs
+ *                            and targeted outputs.
+ */
 function trainingSet() {
-  var inputNum = parseInt($('input[name=input-nodes]').val());
-  var outputNum = parseInt($('input[name=output-nodes]').val());
-  var dataRowLen = inputNum + outputNum;
-  var trainingData = $("textarea[name=training-data]").val().split('\n');
-  var trainSet = [];
+  var inputNum = parseInt($('input[name=input-nodes]').val()),
+      outputNum = parseInt($('input[name=output-nodes]').val()),
+      dataRowLen = inputNum + outputNum,
+      trainingData = $("textarea[name=training-data]").val().split('\n'),
+      trainSet = [],
+      values;
 
   _.forEach(trainingData, function(train_row) {
-    var values = train_row.split(',');
-
+    values = train_row.split(',');
     trainSet.push({
       'input': _.first(values, values.length - outputNum),
       'output': _.last(values, outputNum)
@@ -72,24 +89,26 @@ function trainingSet() {
   return trainSet;
 }
 
+/* Training the network.
+ * 
+ * @returns {Object} myLSTM: The trained network.
+ */
 function trainNetwork() {
   var myLSTM = networkStructure();
-  var myTrainer = new Trainer(myLSTM);
-  var trainingData = trainingSet();
-
-  var rate = parseFloat($('input[name=learning-rate]').val()),
+      myTrainer = new Trainer(myLSTM),
+      trainingData = trainingSet(),
+      rate = parseFloat($('input[name=learning-rate]').val()),
       iterations = parseInt($('input[name=iterations]').val()),
       error = parseFloat($('input[name=error-rate]').val()),
       shuffle = $('input[name="shuffle"]').is(':checked'),
-      log = parseInt($('input[name=log-rate]').val()),
       cost = $('select[name=cost]').val();
 
+  errorList = [];
   myTrainer.train(trainingData, {
     rate: rate,
     iterations: iterations,
     error: error,
     shuffle: shuffle,
-    log: log,
     cost: Trainer.cost[cost],
     schedule: {
       every: 50,
@@ -98,23 +117,78 @@ function trainNetwork() {
       }
     }
   });
-  drawErrorRateGraphCanvas();
   return myLSTM;
 }
 
-function testNetwork(network, input) {
-  var output = network.activate(input);
-  $('span.test-output').text(output);
+/* Add test data results to the result table.
+ *
+ * @param {array} data: Array of test result data.
+ */
+function addToResultTable(data) {
+  var totalVariance = 0;
+
+  _.each(data, function(el) {
+    totalVariance += el.variance;
+    $('table.test-output tr:last').after(
+      '<tr><td>'+
+      el.input+
+      '</td><td>'+
+      el.result+
+      '</td><td>'+
+      el.expected+
+      '</td><td>'+
+      el.variance+
+      '</td></tr>'
+    );
+  });
+
+  $('table.test-output tr:last').after(
+    '<tr class="active"><td colspan="3">Average variance</td>'+
+    '<td>' + (totalVariance / data.length) + '</td></tr>'
+  );
 }
 
-var nn;
+/* Test the network.
+ * Takes the data entered in the input textarea, splits into input and target,
+ * activates the network for each row of the test data values and appends the 
+ * results to the test result table.
+ */
+function testNetwork() {
+  var testingData = $("textarea[name=test-data]").val().split('\n'),
+      inputNum = parseInt($('input[name=input-nodes]').val()),
+      outputNum = parseInt($('input[name=output-nodes]').val()),
+      dataRowLen = inputNum + outputNum,
+      trainingResults = [],
+      output,
+      values;
+
+  _.forEach(testingData, function(row) {
+    values = row.split(',');
+
+    output = nn.activate(_.first(values, inputNum));
+    trainingResults.push({
+      input: values,
+      result: output,
+      expected: values[values.length - 1],
+      variance: Math.abs(values[values.length - 1] - output)
+    });
+  });
+
+  addToResultTable(trainingResults);
+}
+
+/*******************************************************************************
+                            UI ACTION BUTTON EVENTS
+*******************************************************************************/
+
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
   nn = trainNetwork();
+  drawErrorRateGraphCanvas();
 });
 
 $('button.test-network').click(function() {
-  testNetwork(nn, $('input[name=test-input]').val().split(','));
+  testNetwork();
 });
 
 // SAVE THE NETWORK

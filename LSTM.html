@@ -38,7 +38,7 @@
       <div class="col-md-4 network-structure">
         <h3>Perceptron structure:</h3>
         <div class="form-group">
-          <label>Input layers number: </label>
+          <label>Input neurons number: </label>
           <input type="number" class="form-control" name="input-nodes" min="1">
         </div>
         <div class="blocks form-group">
@@ -46,7 +46,7 @@
           <input type="number" class="form-control" name="blocks" min="1">
         </div>
         <div class="form-group">
-          <label>Output layers number: </label>
+          <label>Output neurons number: </label>
           <input type="number" class="form-control" name="output-nodes" min="1">
         </div>
       </div>
@@ -86,10 +86,6 @@
               <option>BINARY</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Log every:</label>
-            <input type="number" class="form-control" name="log-rate" min="0" value="1000">
-          </div>
         </form>
       </div>
     <button class="train-network col-md-12 btn-lg btn-success">TRAIN</button>
@@ -128,13 +124,26 @@
       Network Testing
     </h2>
     <div class="row network-testing">
-      <form class="form-inline">
-        <div class="form-group">
-          <label>Input: </label><input type="text" class="form-control" name="test-input">
-          <label>Output: </label><span class="test-output"></span>
+      <form class="form-inline col-md-12">
+        <div class="form-group col-md-12">
+        <div class="col-md-3">
+          <h3>Input: </h3>
+          <textarea rows="10" class="form-control" cols="30" name="test-data"></textarea>
         </div>
-      </form>
-      <button class="btn btn-success test-network">Test</button>
+        <div class="col-md-9">
+          <h3>Results: </h3>
+          <table class="test-output table table-bordered">
+            <tr>
+              <th>Input data</th>
+              <th>Result</th>
+              <th>Expected</th>
+              <th>Variance</th>
+            </tr>
+          </table>
+        </div>
+        </div>
+    </form>
+    <button class="btn btn-success test-network col-md-5">Test</button>
     </div>
 
   </div>
