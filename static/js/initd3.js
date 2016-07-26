@@ -17,19 +17,22 @@ var errorSvg,
     previous = 0;
 
 
+/* Each neuron in the network had an ID which is the same as the ID of the
+ * displayed neuron on the SVG. Each of the neuron objects has connections
+ * properies, each of which has information from and to which neuron is the
+ * connection linked and it's weight (among other things).
+ * Here we are using the 'projected' connections and display only connections
+ * that the neuron projects.
+ *
+ * @param {array} list of neurons with particular parameters.
+ */
 function drawConnections(list) {
-    // Each neuron in the network had an ID which is the same as the ID of the
-    // displayed neuron on the SVG. Each of the neuron objects has connections
-    // properies, each of which has information from and to which neuron is the
-    // connection linked and it's weight (among other things).
-    // Here we are using the 'projected' connections and display only connections
-    // that the neuron projects.
-
+    var fromSvgNeuron, toSvgNeuron, strokeWidth;
     _.each(nn.neurons(), function(n) {
         _.each(n.neuron.connections.projected, function(conn) {
-            var fromSvgNeuron = list[conn.from.ID - (neuronId - list.length)];
-            var toSvgNeuron = list[conn.to.ID - (neuronId - list.length)];
-            var strokeWidth = conn.weight;
+            fromSvgNeuron = list[conn.from.ID - (neuronId - list.length)];
+            toSvgNeuron = list[conn.to.ID - (neuronId - list.length)];
+            strokeWidth = conn.weight;
 
             svg.append('line')
                 .attr('stroke', 'red')
@@ -37,12 +40,12 @@ function drawConnections(list) {
                 .attr('x1', fromSvgNeuron.x)
                 .attr('y1', fromSvgNeuron.y)
                 .attr('x2', toSvgNeuron.x)
-                .attr('y2', toSvgNeuron.y)
+                .attr('y2', toSvgNeuron.y);
         });
     });
 }
 
-// Remove all the elements from the error rate graph canvas and re-initialize values.
+/* Remove all the elements from the error rate graph canvas and re-initialize values. */
 function clearErrorRateGraphCanvas() {
     errorSvg = d3.select('.error-graph svg');
     errorSvg.selectAll('*').remove();
@@ -51,7 +54,10 @@ function clearErrorRateGraphCanvas() {
     previous = 0;
 }
 
-// Draws one tick on the error rate graph.
+/* Draws one tick on the error rate graph.
+ * 
+ * @param {number} error: The value for the error to be displayed on the error graph.
+ */
 function drawErrorRateTick(error) {
     // Normalize Y axis and invert so that the graph starts from top left.
     var tick = errorSvgHeight - error * normFactor;
@@ -76,15 +82,19 @@ function drawErrorRateTick(error) {
     currentX = currentX + tickWidth;
 }
 
-// Draw the error rate graph canvas axes and calculate
-// the needed values for the graph to display.
+/* Draw the error rate graph canvas axes and calculate
+ * the needed values for the graph to display.
+ */
 function drawErrorRateGraphCanvas() {
+    var logRate, iterations;
+
     clearErrorRateGraphCanvas();
     errorSvg = d3.select('.error-graph svg');
     errorSvgWidth = parseInt(errorSvg.attr('width'));
     errorSvgHeight = parseInt(errorSvg.attr('height'));
-    var logRate = parseInt($('input[name=log-rate]').val());
-    var iterations = parseInt($('input[name=iterations]').val());
+    logRate = parseInt($('input[name=log-rate]').val());
+    iterations = parseInt($('input[name=iterations]').val());
+
     if (errorList.length < errorSvgWidth) {
         tickFrequency = 1;
         tickWidth = Math.floor(errorSvgWidth / errorList.length);
@@ -93,6 +103,7 @@ function drawErrorRateGraphCanvas() {
         tickWidth = 1;
     }
     normFactor = errorSvgHeight / _.max(errorList);
+
     // Y axis
     errorSvg.append('line')
         .attr('x1', 0)
@@ -132,6 +143,11 @@ function drawErrorRateGraphCanvas() {
     console.log('Errors available in `errorList` array.');
 }
 
+/* Return the bias of a neuron when we only have the ID of the neuron.
+ *
+ * @param {number} id: ID of the neuron for which the bias is searched for.
+ * @return {number} Returns the bias value.
+ */
 function findBias(id) {
     var bias = 0;
     _.each(nn.neurons(), function(n) {
@@ -139,27 +155,34 @@ function findBias(id) {
             bias = n.neuron.bias;
         }
     });
-
     return bias;
 }
 
-function initNetworkSvg() {
+/* Initialize the network svg canvas. Draws the network structure, error rate graph
+ * and the weights table.
+ *
+ * @param {array} conns: Array for connections that are sent when a network is loaded.
+ */
+function initNetworkSvg(conns) {
+    var neuron_list = [],
+        hidden_nodes = [],
+        input_nodes = nn.layers.input.size,
+        output_nodes = nn.layers.output.size,
+        layerNum,
+        widthOffset,
+        heightOffset;
+
     svg = d3.select('.network-display svg');
     svg.selectAll('*').remove();  // Clear the SVG for a new one.
     svgWidth = parseInt(svg.attr('width'));
     svgHeight = parseInt(svg.attr('height'));
 
-    var neuron_list = [],
-        input_nodes = nn.layers.input.size,
-        output_nodes = nn.layers.output.size;
-
-    var hidden_nodes = [];
     _.forEach(nn.layers.hidden, function(layer) {
         hidden_nodes.push(layer.size);
     });
 
-    var layerNum = _.flatten([input_nodes, hidden_nodes, output_nodes]);
-    var widthOffset = svgWidth / (layerNum.length * 2);
+    layerNum = _.flatten([input_nodes, hidden_nodes, output_nodes]);
+    widthOffset = svgWidth / (layerNum.length * 2);
 
     for (var i=0; i<layerNum.length; i++) {
         // Draw the neural network with an offset for the edged neurons
@@ -167,7 +190,7 @@ function initNetworkSvg() {
         for (var j=0; j<layerNum[i]; j++) {
             // Height offset depends on the number of neurons in each layer
             // so it can't be set outside the loop.
-            var heightOffset = svgHeight / (layerNum[i] * 2);
+            heightOffset = svgHeight / (layerNum[i] * 2);
 
             neuron_list.push({
                 x: widthOffset + (svgWidth/layerNum.length) * i,
@@ -178,15 +201,21 @@ function initNetworkSvg() {
             neuronId++;
         }
     }
+    drawErrorRateGraphCanvas();
     drawConnections(neuron_list);
     drawNeurons(neuron_list);
-    drawWeightTable();
+    drawWeightTable(conns);
 }
 
+/* Draws the neurons on the network structure svg. Each neuron is a red circle
+ * with radius of 20 pixels, and each has a tooltop that displays that particular
+ * neuron's bias.
+ *
+ * @param {array} list: List of neurons with particular parameters.
+ */
 function drawNeurons(list) {
-    var text_x, text_y;
-
-    var div = d3.select("body")
+    var text_x, text_y,
+        div = d3.select("body")
         .append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
@@ -210,6 +239,8 @@ function drawNeurons(list) {
                     .style("left", (d3.event.pageX) + "px")          
                     .style("top", (d3.event.pageY - 28) + "px");
             });
+
+        // Draw the ID of the neuron in the neuron circle.
         if (neuron.id < 10) {
             text_x = neuron.x - 5;
         } else {
@@ -226,44 +257,60 @@ function drawNeurons(list) {
     });
 }
 
-// Add rows with connections to the weights table.
-// Rows with white background, without a class are connections
-// from input to first hidden layer,
-// gray rows, with 'active' class, are connections between
-// hidden layers,
-// green rows, with 'success' class, are connections from
-// the last hidden layer to output.
-function drawWeightTable() {
+/* Add rows with connections to the weights table.
+ * Rows with white background, without a class are connections from input to
+ * first hidden layer, gray rows, with 'active' class, are connections between
+ * hidden layers, green rows, with 'success' class, are connections from the last
+ * hidden layer to output.
+ * If the network is loaded instead of trained, the JSON with which it is loaded
+ * does not contains `connectedTo` properties so a list of connections is passed
+ * in, and in that case all rows are in white.
+ *
+ * @param {array} conns: Array of connections between neurons.
+ */
+function drawWeightTable(conns) {
     var hidden_tr_class = 'active';
 
-    input_conn = nn.layers.input.connectedTo[0];
-    _.each(nn.layers.input.connectedTo[0].connections, function(conn) {
-        $('.weights-table > table tr:last').after(
-            '<tr><td>' +
-                conn.from.ID +
-            '</td><td>' +
-                conn.to.ID +
-            '</td><td>' +
-                conn.weight +
-            '</td></tr'
-        );
-    })
+    if (conns) {
+        _.each(conns, function(conn) {
+            $('.weights-table > table tr:last').after(
+                '<tr><td>' +
+                    conn.from +
+                '</td><td>' +
+                    conn.to +
+                '</td><td>' +
+                    conn.weight +
+                '</td></tr'
+            );
+        });
+    } else {
+        _.each(nn.layers.input.connectedTo[0].connections, function(conn) {
+            $('.weights-table > table tr:last').after(
+                '<tr><td>' +
+                    conn.from.ID +
+                '</td><td>' +
+                    conn.to.ID +
+                '</td><td>' +
+                    conn.weight +
+                '</td></tr'
+            );
+        });
 
-    _.each(nn.layers.hidden, function(hidden, i) {
-        if (i + 1 === nn.layers.hidden.length)
-            hidden_tr_class = 'success';  // Change the row class for output connections
+        _.each(nn.layers.hidden, function(hidden, i) {
+            if (i + 1 === nn.layers.hidden.length)
+                hidden_tr_class = 'success';  // Change the row class for output connections
 
-        _.each(hidden.connectedTo[0].connections, function(conn) {
-        $('.weights-table > table tr:last').after(
-            '<tr class="' + hidden_tr_class + '"><td>' +
-                conn.from.ID +
-            '</td><td>' +
-                conn.to.ID +
-            '</td><td>' +
-                conn.weight +
-            '</td></tr'
-        );
-        })
-    })
-
+            _.each(hidden.connectedTo[0].connections, function(conn) {
+                $('.weights-table > table tr:last').after(
+                    '<tr class="' + hidden_tr_class + '"><td>' +
+                        conn.from.ID +
+                    '</td><td>' +
+                        conn.to.ID +
+                    '</td><td>' +
+                        conn.weight +
+                    '</td></tr'
+                );
+            });
+        });
+    }
 }

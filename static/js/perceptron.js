@@ -1,18 +1,26 @@
+/* Global variable for storing the neural network to make it accessable if any
+ * additional information that is not displayed on the UI is needed.
+ */ 
 var nn;
 
-function Perceptron(input, hidden, output)
-{
-    // create the layers
-    var inputLayer = new Layer(input);
+/* Creates the perceptron structure of the network.
+ * 
+ * @param {number} input: Number of input nodes.
+ * @param {array} hidden: Array containing the number of neurons for each hidden layer.
+ * @param {number} output: Number of output nodes.
+ */
+function Perceptron(input, hidden, output) {
+    var inputLayer = new Layer(input),
+        hiddenLayers = [],
+        hiddenLayer,
+        outputLayer;
 
     // a perceptron can have more hidden layers
-    var hiddenLayers = [];
     _.each(hidden, function (neuronNum) {
-      var hiddenLayer = new Layer(neuronNum);
-
+      hiddenLayer = new Layer(neuronNum);
       hiddenLayers.push(hiddenLayer);
     });
-    var outputLayer = new Layer(output);
+    outputLayer = new Layer(output);
 
     // connect the layers
     inputLayer.project(hiddenLayers[0]);
@@ -29,39 +37,48 @@ function Perceptron(input, hidden, output)
     });
 }
 
-// CREATE THE NETWORK
+/* Create the network.
+ *
+ * @returns {Object} myPerceptron: network object.
+ */
 function networkStructure() {
-  var input = parseInt($('input[name=input-nodes]').val());
+  var input = parseInt($('input[name=input-nodes]').val()),
+      output = parseInt($('input[name=output-nodes]').val()),
+      hidden = [],
+      myPerceptron;
 
-  var hidden = [];
   $('input[name=hidden-nodes]').each(function(el) {
     if ($(this).val())
       hidden.push(parseInt($(this).val()));
   });
-  var output = parseInt($('input[name=output-nodes]').val());
 
   Perceptron.prototype = new Network();
   Perceptron.prototype.constructor = Perceptron;
-  var myPerceptron = new Perceptron(input, hidden, output);
+  myPerceptron = new Perceptron(input, hidden, output);
   return myPerceptron;
 }
 
-// RETRIEVE AND PREPARE TRAINING DATA
-// The format of the train set has to be a list of objects, each with
-// 'input' property that is a list of input values, and 'output' that is
-// also a list of output values.
+/* Retrieve and prepare training data.
+ * The format of the train set has to be a list of objects, each with
+ * 'input' property that is a list of input values, and 'output' that is
+ * also a list of output values.
+ *
+ * @returns {array} trainSet: The training data set containing the inputs
+ *                            and targeted outputs.
+ */
 function trainingSet() {
-  var inputNum = parseInt($('input[name=input-nodes]').val());
-  var outputNum = parseInt($('input[name=output-nodes]').val());
-  var dataRowLen = inputNum + outputNum;
-  var trainingData = $("textarea[name=training-data]").val().split('\n');
-  var trainSet = [];
+  var inputNum = parseInt($('input[name=input-nodes]').val()),
+      outputNum = parseInt($('input[name=output-nodes]').val()),
+      dataRowLen = inputNum + outputNum,
+      trainingData = $("textarea[name=training-data]").val().split('\n'),
+      trainSet = [],
+      values;
 
   _.forEach(trainingData, function(train_row) {
-    var values = train_row.split(',');
+    values = train_row.split(',');
 
     // training data items count has to be same
-    // as input_nodes+output_nodes count.
+    // as input_nodes + output_nodes count.
     if (values.length > dataRowLen)
       throw 'Inconsistent training data';
 
@@ -74,12 +91,15 @@ function trainingSet() {
   return trainSet;
 }
 
+/* Training the network.
+ * 
+ * @returns {Object} myPerceptron: The trained network.
+ */
 function trainNetwork() {
-  var myPerceptron = networkStructure();
-  var myTrainer = new Trainer(myPerceptron);
-  var trainingData = trainingSet();
-
-  var rate = parseFloat($('input[name=learning-rate]').val()),
+  var myPerceptron = networkStructure(),
+      myTrainer = new Trainer(myPerceptron),
+      trainingData = trainingSet(),
+      rate = parseFloat($('input[name=learning-rate]').val()),
       iterations = parseInt($('input[name=iterations]').val()),
       error = parseFloat($('input[name=error-rate]').val()),
       shuffle = $('input[name="shuffle"]').is(':checked'),
@@ -100,13 +120,17 @@ function trainNetwork() {
       }
     }
   });
-  drawErrorRateGraphCanvas();
+  
   return myPerceptron;
 }
 
-
+/* Add test data results to the result table.
+ *
+ * @param {array} data: Array of test result data.
+ */
 function addToResultTable(data) {
   var total_variance = 0;
+
   _.each(data, function(el) {
     total_variance += el.variance;
     $('table.test-output tr:last').after(
@@ -128,6 +152,10 @@ function addToResultTable(data) {
   );
 }
 
+/*******************************************************************************
+                            UI ACTION BUTTON EVENTS
+*******************************************************************************/
+
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
   nn = trainNetwork();
@@ -135,17 +163,19 @@ $('button.train-network').click(function() {
 });
 
 $('button.test-network').click(function() {
-  var testingData = $("textarea[name=test-data]").val().split('\n');
-  var inputNum = parseInt($('input[name=input-nodes]').val());
-  var outputNum = parseInt($('input[name=output-nodes]').val());
-  var dataRowLen = inputNum + outputNum;
-  var trainingResults = [],
-      output;
+  var testingData = $("textarea[name=test-data]").val().split('\n'),
+      inputNum = parseInt($('input[name=input-nodes]').val()),
+      outputNum = parseInt($('input[name=output-nodes]').val()),
+      dataRowLen = inputNum + outputNum,
+      trainingResults = [],
+      output,
+      values;
 
   _.forEach(testingData, function(row) {
-    var values = row.split(',');
+    values = row.split(',');
     if (values.length > dataRowLen + 1)
       throw 'Inconsistent testing data!';
+
     output = nn.activate(_.first(values, inputNum));
     trainingResults.push({
       input: values,
@@ -160,15 +190,16 @@ $('button.test-network').click(function() {
 
 // SAVE THE NETWORK
 $('button.save-network').click(function() {
-  var data = JSON.stringify(nn.toJSON());
-  var url = 'data:text/json;charset=utf8,' + encodeURIComponent(data);
+  var data = JSON.stringify(nn.toJSON()),
+      url = 'data:text/json;charset=utf8,' + encodeURIComponent(data);
   window.open(url, '_blank');
   window.focus();
 });
 
 // LOAD THE NETWORK
 $('button.load-network').click(function() {
-  var network = $('textarea[name=load-network-content]').val();
-  nn = Network.fromJSON(JSON.parse(network));
-  initNetworkSvg();
+  var network = $('textarea[name=load-network-content]').val(),
+      loaded_network = JSON.parse(network);
+  nn = Network.fromJSON(loaded_network);
+  initNetworkSvg(loaded_network.connections);
 });
