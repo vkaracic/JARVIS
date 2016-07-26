@@ -191,6 +191,7 @@ function initNetworkSvg() {
     }
     drawConnections(neuron_list);
     drawNeurons(neuron_list);
+    drawWeightTable();
 }
 
 function drawNeurons(list) {
@@ -217,5 +218,46 @@ function drawNeurons(list) {
             .style('fill', '#FFFFFF')
             .text(neuron.id);
     });
+}
+
+// Add rows with connections to the weights table.
+// Rows with white background, without a class are connections
+// from input to first hidden layer,
+// gray rows, with 'active' class, are connections between
+// hidden layers,
+// green rows, with 'success' class, are connections from
+// the last hidden layer to output.
+function drawWeightTable() {
+    var hidden_tr_class = 'active';
+
+    input_conn = nn.layers.input.connectedTo[0];
+    _.each(nn.layers.input.connectedTo[0].connections, function(conn) {
+        $('.weights-table > table tr:last').after(
+            '<tr><td>' +
+                conn.from.ID +
+            '</td><td>' +
+                conn.to.ID +
+            '</td><td>' +
+                conn.weight +
+            '</td></tr'
+        );
+    })
+
+    _.each(nn.layers.hidden, function(hidden, i) {
+        if (i + 1 === nn.layers.hidden.length)
+            hidden_tr_class = 'success';  // Change the row class for output connections
+
+        _.each(hidden.connectedTo[0].connections, function(conn) {
+        $('.weights-table > table tr:last').after(
+            '<tr class="' + hidden_tr_class + '"><td>' +
+                conn.from.ID +
+            '</td><td>' +
+                conn.to.ID +
+            '</td><td>' +
+                conn.weight +
+            '</td></tr'
+        );
+        })
+    })
 
 }
