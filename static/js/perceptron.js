@@ -128,6 +128,14 @@ function trainNetwork() {
   return myPerceptron;
 }
 
+function avgVariance(data) {
+  var total = 0;
+  _.each(data, function(val) {
+    total += val;
+  });
+  return total / data.length;
+}
+
 /* Add test data results to the result table.
  *
  * @param {array} data: Array of test result data.
@@ -136,7 +144,7 @@ function addToResultTable(data) {
   var totalVariance = 0;
 
   _.each(data, function(el) {
-    totalVariance += el.variance;
+    totalVariance += avgVariance(el.variance);
     $('table.test-output tr:last').after(
       '<tr><td>'+
       el.input+
@@ -173,19 +181,25 @@ $('button.test-network').click(function() {
       dataRowLen = inputNum + outputNum,
       trainingResults = [],
       output,
-      values;
+      values,
+      variance;
 
   _.forEach(testingData, function(row) {
+    variance = [];
     values = row.split(',');
     if (values.length > dataRowLen + 1)
       throw 'Inconsistent testing data!';
 
     output = nn.activate(_.first(values, inputNum));
+    _.each(output, function(val, i) {
+        variance.push(Math.abs(values[inputNum + i] - val));
+    });
+
     trainingResults.push({
       input: values,
       result: output,
-      expected: values[values.length - 1],
-      variance: Math.abs(values[values.length - 1] - output)
+      expected: values.slice(values.length - outputNum, values.length),
+      variance: variance
     });
   });
 
