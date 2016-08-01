@@ -128,6 +128,10 @@ function trainNetwork() {
   return myPerceptron;
 }
 
+/* Calculate the average of an array with values
+ *
+ * @param {array} data: Array of variance data.
+ */
 function avgVariance(data) {
   var total = 0;
   _.each(data, function(val) {
@@ -196,9 +200,9 @@ $('button.test-network').click(function() {
     });
 
     trainingResults.push({
-      input: values,
+      input: _.first(values, inputNum),
       result: output,
-      expected: values.slice(values.length - outputNum, values.length),
+      expected: _.last(values, outputNum),
       variance: variance
     });
   });

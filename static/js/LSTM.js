@@ -14,8 +14,6 @@ function LSTM(input, blocks, output) {
         forgetGate = new Layer(blocks, 'forgetGate'),
         memoryCell = new Layer(blocks, 'memoryCell'),
         outputLayer = new Layer(output),
-        input,
-        output,
         self;
 
     // input layer connections
@@ -83,7 +81,7 @@ function trainingSet() {
     trainSet.push({
       'input': _.first(values, values.length - outputNum),
       'output': _.last(values, outputNum)
-    })
+    });
   });
 
   return trainSet;
@@ -120,6 +118,18 @@ function trainNetwork() {
   return myLSTM;
 }
 
+/* Calculate the average of an array with values
+ * DRY !!!
+ * @param {array} data: Array of variance data.
+ */
+function avgVariance(data) {
+  var total = 0;
+  _.each(data, function(val) {
+    total += val;
+  });
+  return total / data.length;
+}
+
 /* Add test data results to the result table.
  *
  * @param {array} data: Array of test result data.
@@ -128,7 +138,7 @@ function addToResultTable(data) {
   var totalVariance = 0;
 
   _.each(data, function(el) {
-    totalVariance += el.variance;
+    totalVariance += avgVariance(el.variance);
     $('table.test-output tr:last').after(
       '<tr><td>'+
       el.input+
@@ -160,17 +170,23 @@ function testNetwork() {
       dataRowLen = inputNum + outputNum,
       trainingResults = [],
       output,
-      values;
+      values,
+      variance;
 
   _.forEach(testingData, function(row) {
+    variance = [];
     values = row.split(',');
 
     output = nn.activate(_.first(values, inputNum));
+    _.each(output, function(val, i) {
+        variance.push(Math.abs(values[inputNum + i] - val));
+    });
+
     trainingResults.push({
-      input: values,
+      input: _.first(values, inputNum),
       result: output,
-      expected: values[values.length - 1],
-      variance: Math.abs(values[values.length - 1] - output)
+      expected: _.last(values, outputNum),
+      variance: variance
     });
   });
 
