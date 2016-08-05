@@ -165,25 +165,25 @@ function addToResultTable(data) {
  */
 function testNetwork() {
   var testingData = $("textarea[name=test-data]").val().split('\n'),
-      inputNum = parseInt($('input[name=input-nodes]').val()),
       outputNum = parseInt($('input[name=output-nodes]').val()),
-      dataRowLen = inputNum + outputNum,
       trainingResults = [],
       output,
       values,
-      variance;
+      variance,
+      inputLength;
 
   _.forEach(testingData, function(row) {
     variance = [];
     values = row.split(',');
+    inputLength = values.length - outputNum;
 
-    output = nn.activate(_.first(values, inputNum));
+    output = nn.activate(_.first(values, inputLength));
     _.each(output, function(val, i) {
-        variance.push(Math.abs(values[inputNum + i] - val));
+        variance.push(Math.abs(values[inputLength + i] - val));
     });
 
     trainingResults.push({
-      input: _.first(values, inputNum),
+      input: _.first(values, inputLength),
       result: output,
       expected: _.last(values, outputNum),
       variance: variance
