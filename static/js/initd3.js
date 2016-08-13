@@ -27,15 +27,20 @@ var errorSvg,
  * @param {array} list of neurons with particular parameters.
  */
 function drawConnections(list) {
-    var fromSvgNeuron, toSvgNeuron, strokeWidth;
+    var fromSvgNeuron, toSvgNeuron, strokeWidth, strokeColor;
     _.each(nn.neurons(), function(n) {
         _.each(n.neuron.connections.projected, function(conn) {
             fromSvgNeuron = list[conn.from.ID - (neuronId - list.length)];
             toSvgNeuron = list[conn.to.ID - (neuronId - list.length)];
             strokeWidth = conn.weight;
+            strokeColor = 'red';
+
+            // Draw the input weights with green color.
+            if (toSvgNeuron === list[list.length - 1])
+                strokeColor = 'green';
 
             svg.append('line')
-                .attr('stroke', 'red')
+                .attr('stroke', strokeColor)
                 .attr('stroke-width', strokeWidth)
                 .attr('x1', fromSvgNeuron.x)
                 .attr('y1', fromSvgNeuron.y)
