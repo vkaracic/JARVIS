@@ -210,6 +210,7 @@ function initNetworkSvg(conns) {
     drawConnections(neuronList);
     drawNeurons(neuronList);
     drawWeightTable(conns);
+    drawBiasTable();
 }
 
 /* Draws the neurons on the network structure svg. Each neuron is a red circle
@@ -285,7 +286,7 @@ function drawWeightTable(conns) {
                     conn.to +
                 '</td><td>' +
                     conn.weight +
-                '</td></tr'
+                '</td></tr>'
             );
         });
     } else {
@@ -297,7 +298,7 @@ function drawWeightTable(conns) {
                     conn.to.ID +
                 '</td><td>' +
                     conn.weight +
-                '</td></tr'
+                '</td></tr>'
             );
         });
 
@@ -313,9 +314,32 @@ function drawWeightTable(conns) {
                         conn.to.ID +
                     '</td><td>' +
                         conn.weight +
-                    '</td></tr'
+                    '</td></tr>'
                 );
             });
         });
     }
+}
+
+/* Fills in the bias table with neuron biases. */
+function drawBiasTable() {
+    var nonInputNeurons = [];
+    _.each(nn.neurons(), function(neuron) {
+        if (neuron.layer !== 'input') {
+            nonInputNeurons.push({
+                id: neuron.neuron.ID,
+                bias: neuron.neuron.bias
+            });
+        }
+    });
+
+    _.each(nonInputNeurons, function(neuron) {
+        $('.bias-table > table tr:last').after(
+            '<tr><td>' +
+            neuron.id +
+            '</td><td>' +
+            neuron.bias +
+            '</td></tr>'
+        );
+    });
 }
