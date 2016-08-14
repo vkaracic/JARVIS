@@ -223,5 +223,5 @@ $('button.load-network').click(function() {
   var network = $('textarea[name=load-network-content]').val(),
       loadedNetwork = JSON.parse(network);
   nn = Network.fromJSON(loadedNetwork);
-  initNetworkSvg(loaded_network.connections);
+  initNetworkSvg(loadedNetwork.connections);
 });

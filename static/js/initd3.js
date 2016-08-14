@@ -169,10 +169,10 @@ function findBias(id) {
  * @param {array} conns: Array for connections that are sent when a network is loaded.
  */
 function initNetworkSvg(conns) {
-    var neuron_list = [],
-        hidden_nodes = [],
-        input_nodes = nn.layers.input.size,
-        output_nodes = nn.layers.output.size,
+    var neuronList = [],
+        hiddenNodes = [],
+        inputNodes = nn.layers.input.size,
+        outputNodes = nn.layers.output.size,
         layerNum,
         widthOffset,
         heightOffset;
@@ -183,10 +183,10 @@ function initNetworkSvg(conns) {
     svgHeight = parseInt(svg.attr('height'));
 
     _.forEach(nn.layers.hidden, function(layer) {
-        hidden_nodes.push(layer.size);
+        hiddenNodes.push(layer.size);
     });
 
-    layerNum = _.flatten([input_nodes, hidden_nodes, output_nodes]);
+    layerNum = _.flatten([inputNodes, hiddenNodes, outputNodes]);
     widthOffset = svgWidth / (layerNum.length * 2);
 
     for (var i=0; i<layerNum.length; i++) {
@@ -197,7 +197,7 @@ function initNetworkSvg(conns) {
             // so it can't be set outside the loop.
             heightOffset = svgHeight / (layerNum[i] * 2);
 
-            neuron_list.push({
+            neuronList.push({
                 x: widthOffset + (svgWidth/layerNum.length) * i,
                 y: heightOffset + (svgHeight/layerNum[i]) * j,
                 id: neuronId,
@@ -207,8 +207,8 @@ function initNetworkSvg(conns) {
         }
     }
     drawErrorRateGraphCanvas();
-    drawConnections(neuron_list);
-    drawNeurons(neuron_list);
+    drawConnections(neuronList);
+    drawNeurons(neuronList);
     drawWeightTable(conns);
 }
 
@@ -219,7 +219,7 @@ function initNetworkSvg(conns) {
  * @param {array} list: List of neurons with particular parameters.
  */
 function drawNeurons(list) {
-    var text_x, text_y,
+    var textX, textY,
         div = d3.select("body")
         .append("div")
         .attr("class", "tooltip")
@@ -247,14 +247,14 @@ function drawNeurons(list) {
 
         // Draw the ID of the neuron in the neuron circle.
         if (neuron.id < 10) {
-            text_x = neuron.x - 5;
+            textX = neuron.x - 5;
         } else {
-            text_x = neuron.x - 10;
+            textX = neuron.x - 10;
         }
-        text_y = neuron.y + 5;
+        textY = neuron.y + 5;
         svg.append('text')
-            .attr('x', text_x)
-            .attr('y', text_y)
+            .attr('x', textX)
+            .attr('y', textY)
             .style('font-size', '16px')
             .style('font-weight', '700')
             .style('fill', '#FFFFFF')
@@ -274,7 +274,7 @@ function drawNeurons(list) {
  * @param {array} conns: Array of connections between neurons.
  */
 function drawWeightTable(conns) {
-    var hidden_tr_class = 'active';
+    var hiddenTrClass = 'active';
 
     if (conns) {
         _.each(conns, function(conn) {
@@ -303,11 +303,11 @@ function drawWeightTable(conns) {
 
         _.each(nn.layers.hidden, function(hidden, i) {
             if (i + 1 === nn.layers.hidden.length)
-                hidden_tr_class = 'success';  // Change the row class for output connections
+                hiddenTrClass = 'success';  // Change the row class for output connections
 
             _.each(hidden.connectedTo[0].connections, function(conn) {
                 $('.weights-table > table tr:last').after(
-                    '<tr class="' + hidden_tr_class + '"><td>' +
+                    '<tr class="' + hiddenTrClass + '"><td>' +
                         conn.from.ID +
                     '</td><td>' +
                         conn.to.ID +
