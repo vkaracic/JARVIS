@@ -148,21 +148,6 @@ function drawErrorRateGraphCanvas() {
     console.log('Errors available in `errorList` array.');
 }
 
-/* Return the bias of a neuron when we only have the ID of the neuron.
- *
- * @param {number} id: ID of the neuron for which the bias is searched for.
- * @return {number} Returns the bias value.
- */
-function findBias(id) {
-    var bias = 0;
-    _.each(nn.neurons(), function(n) {
-        if (parseInt(n.neuron.ID) === neuronId) {
-            bias = n.neuron.bias;
-        }
-    });
-    return bias;
-}
-
 /* Initialize the network svg canvas. Draws the network structure, error rate graph
  * and the weights table.
  *
@@ -200,8 +185,7 @@ function initNetworkSvg(conns) {
             neuronList.push({
                 x: widthOffset + (svgWidth/layerNum.length) * i,
                 y: heightOffset + (svgHeight/layerNum[i]) * j,
-                id: neuronId,
-                bias: findBias(neuronId)
+                id: neuronId
             });
             neuronId++;
         }
@@ -214,8 +198,7 @@ function initNetworkSvg(conns) {
 }
 
 /* Draws the neurons on the network structure svg. Each neuron is a red circle
- * with radius of 20 pixels, and each has a tooltop that displays that particular
- * neuron's bias.
+ * with radius of 20 pixels.
  *
  * @param {array} list: List of neurons with particular parameters.
  */
@@ -233,18 +216,7 @@ function drawNeurons(list) {
             .attr('cy', neuron.y)
             .attr('r', 20)
             .attr('id', neuron.id)
-            .style('fill', 'red')
-            .on('mouseover', function() {
-                div.transition()
-                    .duration(500)  
-                    .style("opacity", 0);
-                div.transition()
-                    .duration(200)  
-                    .style("opacity", 0.9);  
-                div .html('<p>' + neuron.bias + '</p>')
-                    .style("left", (d3.event.pageX) + "px")          
-                    .style("top", (d3.event.pageY - 28) + "px");
-            });
+            .style('fill', 'red');
 
         // Draw the ID of the neuron in the neuron circle.
         if (neuron.id < 10) {
