@@ -107,11 +107,12 @@ function trainNetwork() {
       iterations = parseInt($('input[name=iterations]').val()),
       error = parseFloat($('input[name=error-rate]').val()),
       shuffle = $('input[name="shuffle"]').is(':checked'),
-      cost = $('select[name=cost]').val();
+      cost = $('select[name=cost]').val(),
+      results;
 
   myPerceptron.setOptimize(false);
   errorList = [];
-  myTrainer.train(trainingData, {
+  results = myTrainer.train(trainingData, {
     rate: rate,
     iterations: iterations, 
     error: error,
@@ -124,7 +125,9 @@ function trainNetwork() {
       }
     }
   });
-  
+  console.log('Finished training in [' + results.time + 'ms].');
+  console.log('Iterations: [' + results.iterations + ']');
+  console.log('Final error: [' + results.error + ']');
   return myPerceptron;
 }
 

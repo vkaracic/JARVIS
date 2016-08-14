@@ -145,7 +145,6 @@ function drawErrorRateGraphCanvas() {
             drawErrorRateTick(val);
         }
     });
-    console.log('Errors available in `errorList` array.');
 }
 
 /* Initialize the network svg canvas. Draws the network structure, error rate graph
