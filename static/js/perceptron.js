@@ -108,23 +108,36 @@ function trainNetwork() {
       error = parseFloat($('input[name=error-rate]').val()),
       shuffle = $('input[name="shuffle"]').is(':checked'),
       cost = $('select[name=cost]').val(),
-      results;
+      results,
+      total;
 
-  myPerceptron.setOptimize(false);
+  myPerceptron.setOptimize(true);
   errorList = [];
-  results = myTrainer.train(trainingData, {
-    rate: rate,
-    iterations: iterations, 
-    error: error,
-    shuffle: shuffle,
-    cost: Trainer.cost[cost],
-    schedule: {
-      every: 50,
-      do: function(data) {
-          errorList.push(data.error);
+  total = [];
+
+  for (var i = 0; i < 10; i++){
+    results = myTrainer.train(trainingData, {
+      rate: rate,
+      iterations: iterations, 
+      error: error,
+      shuffle: shuffle,
+      cost: Trainer.cost[cost],
+      schedule: {
+        every: 50,
+        do: function(data) {
+            errorList.push(data.error);
+        }
       }
-    }
-  });
+    });
+    total.push({
+      'num': i,
+      'time': results.time,
+      'iterations': results.iterations,
+      'error': results.error
+    });
+    myPerceptron.reset();
+  }
+  console.log(total);
   console.log('Finished training in [' + results.time + 'ms].');
   console.log('Iterations: [' + results.iterations + ']');
   console.log('Final error: [' + results.error + ']');
@@ -178,7 +191,7 @@ function addToResultTable(data) {
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
   nn = trainNetwork();
-  initNetworkSvg();
+  // initNetworkSvg();
 });
 
 $('button.test-network').click(function() {
