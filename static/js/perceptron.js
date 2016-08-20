@@ -108,36 +108,25 @@ function trainNetwork() {
       error = parseFloat($('input[name=error-rate]').val()),
       shuffle = $('input[name="shuffle"]').is(':checked'),
       cost = $('select[name=cost]').val(),
-      results,
-      total;
+      results;
 
-  myPerceptron.setOptimize(true);
+  myPerceptron.setOptimize(false);
   errorList = [];
-  total = [];
 
-  for (var i = 0; i < 10; i++){
-    results = myTrainer.train(trainingData, {
-      rate: rate,
-      iterations: iterations, 
-      error: error,
-      shuffle: shuffle,
-      cost: Trainer.cost[cost],
-      schedule: {
-        every: 50,
-        do: function(data) {
-            errorList.push(data.error);
-        }
+  results = myTrainer.train(trainingData, {
+    rate: rate,
+    iterations: iterations, 
+    error: error,
+    shuffle: shuffle,
+    cost: Trainer.cost[cost],
+    schedule: {
+      every: 50,
+      do: function(data) {
+          errorList.push(data.error);
       }
-    });
-    total.push({
-      'num': i,
-      'time': results.time,
-      'iterations': results.iterations,
-      'error': results.error
-    });
-    myPerceptron.reset();
-  }
-  console.log(total);
+    }
+  });
+
   console.log('Finished training in [' + results.time + 'ms].');
   console.log('Iterations: [' + results.iterations + ']');
   console.log('Final error: [' + results.error + ']');
@@ -191,7 +180,7 @@ function addToResultTable(data) {
 // TEST / RUN THE NETWORK
 $('button.train-network').click(function() {
   nn = trainNetwork();
-  // initNetworkSvg();
+  initNetworkSvg();
 });
 
 $('button.test-network').click(function() {
@@ -237,7 +226,11 @@ $('button.save-network').click(function() {
 // LOAD THE NETWORK
 $('button.load-network').click(function() {
   var network = $('textarea[name=load-network-content]').val(),
+      inputField = $('input[name=input-nodes]'),
+      outputField = $('input[name=output-nodes]'),
       loadedNetwork = JSON.parse(network);
   nn = Network.fromJSON(loadedNetwork);
+  inputField.val(nn.layers.input.size);
+  outputField.val(nn.layers.output.size);
   initNetworkSvg(loadedNetwork.connections);
 });
