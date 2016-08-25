@@ -127,7 +127,7 @@ function trainNetwork() {
     }
   });
 
-  console.log('Finished training in [' + results.time + 'ms].');
+  console.log('Finished training in [' + results.time + 'ms]');
   console.log('Iterations: [' + results.iterations + ']');
   console.log('Final error: [' + results.error + ']');
   return myPerceptron;
