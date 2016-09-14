@@ -59,6 +59,7 @@ function clearErrorRateGraphCanvas() {
     previous = 0;
 }
 
+
 /* Draws one tick on the error rate graph.
  * 
  * @param {number} error: The value for the error to be displayed on the error graph.
@@ -66,6 +67,7 @@ function clearErrorRateGraphCanvas() {
 function drawErrorRateTick(error) {
     // Normalize Y axis and invert so that the graph starts from top left.
     var tick = errorSvgHeight - error * normFactor;
+    var div;
 
     if (previous === 0) {
         previous = {
@@ -79,8 +81,12 @@ function drawErrorRateTick(error) {
             .attr('x2', currentX)
             .attr('y2', tick)
             .attr('stroke', 'blue')
-            .attr('stroke-width', 2)
-            .attr('error', error);
+            .attr('stroke-width', 3)
+            .attr('error', error)
+            .on('mouseover', function() {
+                $('.error-value p').text(error);
+            })
+
         previous.x = currentX;
         previous.y = tick;
     }
@@ -104,7 +110,7 @@ function drawErrorRateGraphCanvas() {
         tickFrequency = 1;
         tickWidth = Math.floor(errorSvgWidth / errorList.length);
     } else {
-        tickFrequency = Math.floor(errorList.length / errorSvgWidth); // Needs to be an integer.
+        tickFrequency = Math.max(2, Math.floor(errorList.length / (errorSvgWidth - 100))); // Needs to be an integer.
         tickWidth = 1;
     }
     normFactor = errorSvgHeight / _.max(errorList);
@@ -145,6 +151,8 @@ function drawErrorRateGraphCanvas() {
             drawErrorRateTick(val);
         }
     });
+
+    $('.final-error-value p').text(errorList[errorList.length-1]);
 }
 
 /* Initialize the network svg canvas. Draws the network structure, error rate graph
@@ -163,6 +171,11 @@ function initNetworkSvg(conns) {
 
     svg = d3.select('.network-display svg');
     svg.selectAll('*').remove();  // Clear the SVG for a new one.
+
+    // Remove weights and bias table rows.
+    $('.weights-table tr').has('td').remove();
+    $('.bias-table tr').has('td').remove();
+
     svgWidth = parseInt(svg.attr('width'));
     svgHeight = parseInt(svg.attr('height'));
 

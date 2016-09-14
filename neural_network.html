@@ -46,6 +46,7 @@
           <input type="number" class="form-control" name="hidden-nodes" min="1">
           <div class="append-layer" type="hidden"></div>
           <button class="add-hidden-layer btn btn-primary">Add hidden layer</button>
+          <button class="remove-hidden-layer btn btn-danger hidden">Remove last hidden layer</button>
         </div>
 
         <div class="form-group">
@@ -137,6 +138,8 @@
       </div>
       <div class="col-md-6 error-graph">
         <svg width="500" height="300"></svg>
+        <div class="col-md-6 error-value"><p></p></div>
+        <div class="col-md-6 final-error-value">Final error: <p></p></div>
       </div>
     </div>
 
@@ -165,7 +168,7 @@
         </div>
         </div>
     </form>
-    <button class="btn btn-success test-network col-md-5">Test</button>
+    <button class="test-network btn-lg btn-success col-md-2">Test</button>
     </div>
 
   </div>

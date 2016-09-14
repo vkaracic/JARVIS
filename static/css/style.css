@@ -19,15 +19,17 @@ header {
     margin-bottom: 10px;
 }
 
+.network-testing {
+    margin-bottom: 50px;
+}
+
 .network-testing form {
     display: inline-block;
     margin-bottom: 10px;
 }
 
 .network-testing label {
-
     margin-right: 10px;
-
 }
 
 .network-testing input {
@@ -40,4 +42,20 @@ header {
     -ms-transform: rotate(90deg);
     -o-transform: rotate(90deg);
     filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+.error-value p {
+    width: 75%;
+    border: 1px solid #EDEDED;
+    border-radius: 5px;
+    margin: 0 5px;
+    -webkit-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.28);
+    -moz-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.28);
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.28);
+    text-align: center;
+    line-height: 25px;
+}
+
+button.test-network {
+    margin-left: 4%;
 }
